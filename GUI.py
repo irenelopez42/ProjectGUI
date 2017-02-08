@@ -67,13 +67,13 @@ misspnum.grid(row=5, columnspan=2)
 
 #Button to open root browser
 rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 11) ,bg="Blue", 
-             activebackground="Black", fg= "White", command=ROOT.TBrowser)
+             activebackground="Black", fg= "White",activeforeground="White", command=ROOT.TBrowser)
 rbrowser.grid(row=12)
 
 
 #Button to start analysis
 run = Button(frame1, text="Run Analysis", font=("Calibri",16) ,bg="Green", 
-             activebackground="Black", fg= "White")
+             activebackground="Black", fg= "White",activeforeground="White")
 run.grid(row=13, columnspan=2, sticky=S)
 
 window.mainloop()
