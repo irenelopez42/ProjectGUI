@@ -7,6 +7,7 @@ Created on Mon Feb  6 14:25:40 2017
 
 import ROOT
 from Tkinter import * 
+import threading
 
 window = Tk()
 
@@ -66,8 +67,43 @@ misspnum = Scale(frame1, from_=0, to=100, orient=HORIZONTAL, length=150)
 misspnum.grid(row=5, columnspan=2)
 
 #Button to open root browser
+
+
+latestThread=None # last opened thread
+
+class browser_thread(threading.Thread):
+    """thread for opening a TBrowser"""
+    
+    def __init__(self):
+        self.exit = threading.Event()
+        threading.Thread.__init__(self)
+
+        
+    def run(self):
+        b= ROOT.TBrowser()
+        while not self.exit.is_set():
+            continue
+        
+    def shutdown(self):
+        self.exit.set()
+
+
+def browser():
+    """creates new browser_thread closing
+    the previous one"""    
+    
+    global latestThread
+    print latestThread
+    print threading.active_count()
+    if latestThread!= None:
+        print "test"
+        latestThread.shutdown()
+    latestThread =browser_thread()
+    latestThread.setDaemon(True)
+    latestThread.start()
+
 rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 11) ,bg="Blue", 
-             activebackground="Black", fg= "White",activeforeground="White", command=ROOT.TBrowser)
+             activebackground="Black", fg= "White",activeforeground="White", command=browser)
 rbrowser.grid(row=12)
 
 
