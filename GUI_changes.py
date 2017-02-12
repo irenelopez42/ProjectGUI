@@ -34,23 +34,23 @@ def test():
     print "test"
 
 # create a popup menu
-menu = Menu(window, tearoff=0)
-menu.add_command(label="1", command=test)
-menu.add_command(label="2", command=test)
-menu.add_command(label="3", command=test)
-menu.add_command(label="4", command=test)
-menu.add_command(label="5", command=test)
-menu.add_command(label="6", command=test)
+menu_lep = Menu(window, tearoff=0)
+menu_lep.add_command(label="1", command=test)
+menu_lep.add_command(label="2", command=test)
+menu_lep.add_command(label="3", command=test)
+menu_lep.add_command(label="4", command=test)
+menu_lep.add_command(label="5", command=test)
+menu_lep.add_command(label="6", command=test)
 
 nlep = Label(frame1, text ="Select", bg="Cyan")
-def popup(event):
-    menu.post(event.x_root, event.y_root)
-nlep.bind("<Button-1>", popup)
+def popup_lep(event):
+    menu_lep.post(event.x_root, event.y_root)
+nlep.bind("<Button-1>", popup_lep)
 
 st_lepcb = IntVar()
 def chooseNlep():
     if st_lepcb.get()==1:
-	nlep.grid(row=1,column=0, sticky=E)
+	nlep.grid(row=1,column=0, sticky=W)
     else:
         nlep.grid_forget()
 lyes = Checkbutton(frame1, variable = st_lepcb, onvalue=1,offvalue=0, command=chooseNlep)
@@ -60,16 +60,26 @@ lyes.grid(row=0,column=1, sticky=W)
 wantjet = Label(frame1, text="Choose number jets:", bg="LightCyan2",
                 relief=RAISED, font=("Calibri",11))
 wantjet.grid(row=2, sticky=W)
-njet = Label(frame1, text="Number of jets:")
-entrynjet = Entry(frame1, width=5)
+
+menu_jet = Menu(window, tearoff=0)
+menu_jet.add_command(label="1", command=test)
+menu_jet.add_command(label="2", command=test)
+menu_jet.add_command(label="3", command=test)
+menu_jet.add_command(label="4", command=test)
+menu_jet.add_command(label="5", command=test)
+menu_jet.add_command(label="6", command=test)
+
+njet = Label(frame1, text="Select", bg="Cyan")
+def popup_jet(event):
+    menu_jet.post(event.x_root, event.y_root)
+njet.bind("<Button-1>", popup_jet)
+
 st_jetcb= IntVar()
 def chooseNjet():
     if st_jetcb.get()==1:
-        njet.grid(row=3)
-        entrynjet.grid(row=3, column=1)
+        njet.grid(row=3, sticky=W)
     else:
         njet.grid_forget()
-        entrynjet.grid_forget()
 jyes = Checkbutton(frame1, variable = st_jetcb, onvalue=1,offvalue=0, command=chooseNjet)
 jyes.grid(row=2,column=1, sticky=W)
 
