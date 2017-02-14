@@ -75,6 +75,19 @@ b5_jet = Radiobutton(frame1, text="5 Jets",
                         variable=njet_val, value=5)
 b6_jet = Radiobutton(frame1, text="6 Jets",
                         variable=njet_val, value=6)
+btag_val = IntVar()
+btag_entry = Spinbox(frame1, textvariable=btag_val, from_=0, to=6, width=4) #Entry for number of b-tagged jets
+
+def Nbtagjet(): #function that will show the entry when checkbox clicked
+	if st_btagjetcb.get() ==1:
+		btag_entry.grid(row=13, column=1)
+	else:
+		btag_entry.grid_forget()
+		btag_val.set(0)
+
+st_btagjetcb = IntVar()
+btaggedyes = Checkbutton(frame1, text="Any b-tagged jets?", bg="LightCyan2",
+	 variable = st_btagjetcb, onvalue=1,offvalue=0, command=Nbtagjet) #Extra checkbox for b-tagged jets
 
 st_jetcb = IntVar() #State of checkbox
 def chooseNjet(): #Function for checkbox
@@ -85,6 +98,7 @@ def chooseNjet(): #Function for checkbox
 	b4_jet.grid(row=10)
 	b5_jet.grid(row=11)
 	b6_jet.grid(row=12)
+	btaggedyes.grid(row=13)
     else:
 	njet_val.set(0)
         b1_jet.grid_forget()
@@ -93,6 +107,10 @@ def chooseNjet(): #Function for checkbox
 	b4_jet.grid_forget()
 	b5_jet.grid_forget()
 	b6_jet.grid_forget()
+	btaggedyes.grid_forget()
+	st_btagjetcb.set(0)
+	btag_val.set(0)
+	btag_entry.grid_forget()
 
 jyes = Checkbutton(frame1, text="Choose number jets", bg="LightCyan2", font=("Calibri",10),
 	 variable = st_jetcb, onvalue=1,offvalue=0, command=chooseNjet)
