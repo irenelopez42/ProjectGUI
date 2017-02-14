@@ -123,13 +123,13 @@ slider_WTmass = Scale(frame1, from_=0, to=100, orient=HORIZONTAL, length=150) #D
 st_WTmasscb= IntVar() #Checkbutton state
 def chooseWTmass():  #Function for checkbutton
     if st_WTmasscb.get()==1:
-        slider_WTmass.grid(row=14, column=0) #If state 1, show slider
+        slider_WTmass.grid(row=15, column=0) #If state 1, show slider
     else:
         slider_WTmass.grid_forget()
 
 WTmassyes = Checkbutton(frame1, text="Choose minimum\n W transverse mass (GeV)", font=("Calibri",10), bg="LightCyan2", 
 	variable = st_WTmasscb, onvalue=1,offvalue=0, command=chooseWTmass)
-WTmassyes.grid(row=13,column=0, sticky=W) #Define and show checkbutton
+WTmassyes.grid(row=14,column=0, sticky=W) #Define and show checkbutton
 
 #Slider for missing momentum
 
@@ -138,13 +138,13 @@ slider_missP = Scale(frame1, from_=0, to=100, orient=HORIZONTAL, length=150) #De
 st_missPcb= IntVar() #Checkbutton state
 def choosemissP():  #Function for checkbutton
     if st_missPcb.get()==1:
-        slider_missP.grid(row=16, column=0) #If state 1, show slider
+        slider_missP.grid(row=17, column=0) #If state 1, show slider
     else:
         slider_missP.grid_forget()
 
 missPyes = Checkbutton(frame1, text="Minimum missing\n transverse momentum (Gev)", font=("Calibri",10), bg="LightCyan2", 
 	variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
-missPyes.grid(row=15,column=0, sticky=W) #Define and show checkbutton
+missPyes.grid(row=16,column=0, sticky=W) #Define and show checkbutton
 
 #Button to open root browser
 
@@ -180,13 +180,13 @@ def browser():
 
 rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
              activebackground="Black", fg= "White",activeforeground="White", command=browser)
-rbrowser.grid(row=17)
+rbrowser.grid(row=18)
 
 
 #Button to start analysis
 run = Button(frame1, text="Run Analysis", font=("Calibri",16) ,bg="Green", 
              activebackground="Black", fg= "White", activeforeground="White")
-run.grid(row=18, columnspan=2, sticky=S)
+run.grid(row=19, columnspan=2, sticky=S)
 
 
 window.mainloop()
