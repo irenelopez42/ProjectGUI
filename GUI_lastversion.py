@@ -8,6 +8,9 @@ Created on Mon Feb  6 14:25:40 2017
 import ROOT
 from Tkinter import * 
 import threading
+import CheckFileSuper
+import NewRunScript
+import NewPlotResults
 
 window = Tk()
 
@@ -133,7 +136,12 @@ WTmassyes.grid(row=14,column=0, sticky=W) #Define and show checkbutton
 
 #Slider for missing momentum
 
-slider_missP = Scale(frame1, from_=0, to=100, orient=HORIZONTAL, length=150) #Define slider
+
+
+missE_val = IntVar()
+missE_val.set(0)
+
+slider_missP = Scale(frame1, from_=0, to=100, orient=HORIZONTAL, length=150, variable = missE_val) #Define slider
 
 st_missPcb= IntVar() #Checkbutton state
 def choosemissP():  #Function for checkbutton
@@ -141,14 +149,16 @@ def choosemissP():  #Function for checkbutton
         slider_missP.grid(row=17, column=0) #If state 1, show slider
     else:
         slider_missP.grid_forget()
+        missE_val.set(0)
 
-missPyes = Checkbutton(frame1, text="Minimum missing\n transverse momentum (Gev)", font=("Calibri",10), bg="LightCyan2", 
+missPyes = Checkbutton(frame1, text="Minimum missing\n transverse momentum (GeV)", font=("Calibri",10), bg="LightCyan2", 
 	variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
 missPyes.grid(row=16,column=0, sticky=W) #Define and show checkbutton
 
 #Button to open root browser
 
 latestThread=None # last opened thread
+b= None
 
 class browser_thread(threading.Thread):
     """thread for opening a TBrowser"""
@@ -159,9 +169,11 @@ class browser_thread(threading.Thread):
 
         
     def run(self):
-        b= ROOT.TBrowser()
+        global b
+        b=ROOT.TBrowser()
         while not self.exit.is_set():
             continue
+
         
     def shutdown(self):
         self.exit.set()
@@ -171,9 +183,11 @@ def browser():
     """creates new browser_thread closing
     the previous one"""    
     
+    global b
     global latestThread
     if latestThread!= None:
         latestThread.shutdown()
+       # b.Destructor()  
     latestThread =browser_thread()
     latestThread.setDaemon(True)
     latestThread.start()
@@ -182,11 +196,97 @@ rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue",
              activebackground="Black", fg= "White",activeforeground="White", command=browser)
 rbrowser.grid(row=18)
 
+histograms =[]
+
+
+def run_analysis():
+    """runs the analysis"""
+    
+    global latestThread
+    if latestThread!= None:
+        latestThread.shutdown()
+        latestThread=None
+        
+    selection = []
+    global histograms
+    
+    histograms.append("n_jets")
+    histograms.append("lep_n")
+    histograms.append("etmiss")
+    
+    
+    
+    if njet_val.get() != 0:
+        print njet_val.get()
+        print "test"
+        jetn_chk = CheckFileSuper.CheckNJets(njet_val.get())
+        selection.append(jetn_chk)
+        
+        histograms.append("jet_pt")
+        histograms.append("jet_m")
+        histograms.append("jet_jvf")
+        histograms.append("jet_eta")
+        histograms.append("jet_MV1")
+        
+        if st_btagjetcb.get()==1:
+            btag_chk = CheckFileSuper.CheckBTag(btag_val.get())
+            selection.append(btag_chk)
+            
+    if nlep_val.get() != 0:
+        lepn_chk = CheckFileSuper.CheckNLep(nlep_val.get())
+        selection.append(lepn_chk)
+        
+        histograms.append("lep_pt")
+        histograms.append("lep_eta")
+        histograms.append("lep_phi")
+        histograms.append("lep_E")
+        histograms.append("lep_charge")
+        histograms.append("lep_type")
+
+        histograms.append("leadlep_pt")
+        histograms.append("leadlep_eta")
+        histograms.append("leadlep_phi")
+        histograms.append("leadlep_E")
+        histograms.append("leadlep_charge")
+        histograms.append("leadlep_type")  
+        
+        if nlep_val.get()>1:
+            histograms.append("traillep_pt")
+            histograms.append("traillep_eta")
+            histograms.append("traillep_E")
+            histograms.append("traillep_phi")
+            histograms.append("traillep_charge")
+            histograms.append("traillep_type")
+    
+    if st_missPcb.get()==1:
+        missE_chk = CheckFileSuper.CheckEtMiss(missE_val.get())
+        selection.append(missE_chk)
+     
+    NewRunScript.run(selection,histograms)
+    ROOT.gApplication.Terminate(0) 
+ 
+def plotting():
+    global histograms
+    if histograms == []:
+        return
+    NewPlotResults.plot_results(histograms)   
+    
+plot = Button(frame1, text="Plot Results", font=("Calibri", 10) ,bg="Blue", 
+             activebackground="Black", fg= "White",activeforeground="White", command=plotting)
+plot.grid(row=20)
+
+
+
 
 #Button to start analysis
 run = Button(frame1, text="Run Analysis", font=("Calibri",16) ,bg="Green", 
-             activebackground="Black", fg= "White", activeforeground="White")
+             activebackground="Black", fg= "White", activeforeground="White",command  = run_analysis)
 run.grid(row=19, columnspan=2, sticky=S)
+
+    
+    
+    
+    
 
 
 window.mainloop()
