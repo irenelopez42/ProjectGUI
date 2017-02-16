@@ -275,14 +275,12 @@ class browser_thread(threading.Thread):
     def __init__(self):
         self.exit = threading.Event()
         threading.Thread.__init__(self)
-
-        
+     
     def run(self):
         global b
         b=ROOT.TBrowser()
         while not self.exit.is_set():
             continue
-
         
     def shutdown(self):
         self.exit.set()
@@ -326,35 +324,34 @@ def run_analysis():
     histograms.append("lep_n")
     histograms.append("etmiss")
     
+    histograms.append("jet_pt")
+    histograms.append("jet_m")
+    histograms.append("jet_eta")
+
+    histograms.append("lep_pt")
+    histograms.append("lep_eta")
+    histograms.append("lep_phi")
+    histograms.append("lep_E")
+    histograms.append("lep_charge")
+    histograms.append("lep_type")
     
     
-    if njet_val.get() != 0:
+    if njet_val.get() != 0: #number of jets
         print njet_val.get()
         print "test"
         jetn_chk = CheckFileSuper.CheckNJets(njet_val.get())
         selection.append(jetn_chk)
+ 
         
-        histograms.append("jet_pt")
-        histograms.append("jet_m")
-        histograms.append("jet_jvf")
-        histograms.append("jet_eta")
-        histograms.append("jet_MV1")
-        
-        if st_btagjetcb.get()==1:
+        if st_btagjetcb.get()==1: #btagging
             btag_chk = CheckFileSuper.CheckBTag(btag_val.get())
             selection.append(btag_chk)
             
-    if nlep_val.get() != 0:
+    if nlep_val.get() != 0: #number of leptons
+    
         lepn_chk = CheckFileSuper.CheckNLep(nlep_val.get())
         selection.append(lepn_chk)
-        
-        histograms.append("lep_pt")
-        histograms.append("lep_eta")
-        histograms.append("lep_phi")
-        histograms.append("lep_E")
-        histograms.append("lep_charge")
-        histograms.append("lep_type")
-
+    
         histograms.append("leadlep_pt")
         histograms.append("leadlep_eta")
         histograms.append("leadlep_phi")
@@ -362,6 +359,26 @@ def run_analysis():
         histograms.append("leadlep_charge")
         histograms.append("leadlep_type")  
         
+        if nlep_val.get()==1:        
+            #Tmass
+            checkTMass = CheckFileSuper.CheckTMass(LepTmass_val.get(),0,"WtMass")
+            selection.append(checkTMass)
+            histograms.append("WtMass")
+           
+        if st_lepchargecb.get()!=0: #lepton charge
+            if TwoLepcharge_val.get()==1:
+                twoLepCharge = CheckFileSuper.CheckLepCharge("same")
+            else:
+                twoLepCharge = CheckFileSuper.CheckLepCharge("different")
+            selection.append(twoLepCharge)
+            
+        if st_lepflavourcb.get()!=0: #lepton flavour
+            if TwoLepflavour_val.get()==1:
+                twoLepFlavour = CheckFileSuper.CheckLepFlavour("same")    
+            else:
+                twoLepFlavour = CheckFileSuper.CheckLepFlavour("different")
+            selection.append(twoLepFlavour)
+            
         if nlep_val.get()>1:
             histograms.append("traillep_pt")
             histograms.append("traillep_eta")
@@ -370,7 +387,7 @@ def run_analysis():
             histograms.append("traillep_charge")
             histograms.append("traillep_type")
     
-    if st_missPcb.get()==1:
+    if st_missPcb.get()==1: #missing momentum
         missE_chk = CheckFileSuper.CheckEtMiss(missE_val.get())
         selection.append(missE_chk)
      
@@ -386,10 +403,11 @@ def plotting():
     previousplots=glob.glob('Output/*.png')
     for i in range(0, len(previousplots)): 
     	os.remove(previousplots[i])
+     
     global histograms
-    if histograms == []:
-        return
-    NewPlotResults.plot_results(histograms)
+    if not histograms == []:
+        NewPlotResults.plot_results(histograms)
+    
     plots = glob.glob('Output/*.png')
     lplots = len(plots)
     try:

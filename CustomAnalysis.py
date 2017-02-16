@@ -27,26 +27,33 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
 
 	def analyze(self):
      
- 		eventinfo = self.Store.getEventInfo()
-		leptons = AH.selectAndSortContainer(self.Store.getLeptons(),AH.isGoodLepton, lambda p: p.pt())
-		jets = AH.selectAndSortContainer(self.Store.getJets(),AH.isGoodJet, lambda p: p.pt())
-		EtMiss = self.Store.getEtMiss()
-		EventObject = {"eventinfo" :eventinfo, "leptons" : leptons, "jets" : jets, "EtMiss" :EtMiss}
-     		self.histValDic = self.histogramValueDictionary(EventObject)
-		weight = eventinfo.scalefactor()*eventinfo.eventWeight() if not self.getIsData() else 1		
+         eventinfo = self.Store.getEventInfo()
+         leptons = AH.selectAndSortContainer(self.Store.getLeptons(),AH.isGoodLepton, lambda p: p.pt())
+         jets = AH.selectAndSortContainer(self.Store.getJets(),AH.isGoodJet, lambda p: p.pt())
+         EtMiss = self.Store.getEtMiss()
+         EventObject = {"eventinfo" :eventinfo, "leptons" : leptons, "jets" : jets, "EtMiss" :EtMiss}
+         self.histValDic = self.histogramValueDictionary(EventObject)
+         weight = eventinfo.scalefactor()*eventinfo.eventWeight() if not self.getIsData() else 1		
 		
-		for checktype in self.checkList:
-			if not checktype.check(EventObject):
-				return False
-
-		for histogram in self.histograms:
-			if not isinstance(self.histValDic[histogram],list):
-				self.histObjDic[histogram].Fill(self.histValDic[histogram],weight)
-		
-			else:
-				for item in self.histValDic[histogram]:
-					self.histObjDic[histogram].Fill(item,weight)			
-		return True
+         for checktype in self.checkList:
+            check = checktype.check(EventObject)
+            if check== False:
+                return False
+            elif check != None:
+                checktype.plot(EventObject,self.histObjDic[check],weight)
+                
+                    
+         keys =self.histValDic.keys()
+         for histogram in self.histograms:
+             if histogram not in keys:
+                 continue
+             if not isinstance(self.histValDic[histogram],list):
+                 self.histObjDic[histogram].Fill(self.histValDic[histogram],weight)
+             else:
+                 for item in self.histValDic[histogram]:
+                     self.histObjDic[histogram].Fill(item,weight)			
+        
+         return True
 
 
 	def finalize(self):
@@ -107,6 +114,7 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
 			histogramDictionary["traillep_E"] = trailLepton.e()
 			histogramDictionary["traillep_charge"] = trailLepton.charge()
 			histogramDictionary["traillep_type"] = trailLepton.pdgId()
+   
 
 
 		etmiss = EventObject["EtMiss"]

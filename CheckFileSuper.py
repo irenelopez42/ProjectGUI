@@ -1,3 +1,6 @@
+import Analysis.AnalysisHelpers as AH
+import copy
+
 
 class CheckFile(object):
     """The base class for checking that a certain condition
@@ -8,8 +11,11 @@ class CheckFile(object):
         
     def check(self,EventObject):
         """does the checking"""
+        return None
         
-        return True
+    def plot(self,histogram,EventObject):
+        """plots anything necessary"""
+        pass
            
 class CheckNJets(CheckFile):
     """checking the number of jets"""
@@ -37,7 +43,7 @@ class CheckBTag(CheckFile):
         btags = sum([1 for jet in goodJets if jet.mv1() > 0.7892])        
         if not btags>=self.numBTag:
             return False
-        return True
+        return None
             
 class CheckNLep(CheckFile):
     """checking the number of leptons"""
@@ -50,7 +56,7 @@ class CheckNLep(CheckFile):
         leptons = EventObject["leptons"]
         if not len(leptons) == self.nLep:
             return False
-        return True
+        return None
         
 class CheckEtMiss(CheckFile):
     """checking the minimum transverse missing momentum"""
@@ -63,7 +69,64 @@ class CheckEtMiss(CheckFile):
         EtMiss = EventObject["EtMiss"]
         if self.etmiss >= EtMiss.et():
             return False
-        return True
+        return None
+        
+class CheckLepCharge(CheckFile):
+    """checks if the charges are same or opposite"""
+    
+    def __init__(self,condition):
+        super(CheckLepCharge,self).__init__()
+        self.condition = condition
+        
+    def check(self,EventObject):
+        leptons = EventObject["leptons"]
+        boolCon = True if self.condition == "same" else False        
+        
+        if leptons[0].charge()*leptons[0].charge()>0 == boolCon:
+            return None
+        else:
+            return False
+            
+class CheckLepFlavour(CheckFile):
+    """checks if the lepton flavours are the same"""
+    
+    def __init__(self,condition):
+        super(CheckLepFlavour, self).__init__()
+        self.condition = condition
+        
+    def check(self,EventObject):
+        leptons = EventObject["leptons"]
+        boolCon = True if self.condition == "same" else False
+        
+        if (leptons[0].pdgId() ==leptons[1].pdgId())== boolCon:
+            return None
+        
+        else:
+            return False
+            
+class CheckTMass(CheckFile):
+    """checks the minimum lepton momentum"""
+    
+    def __init__(self,minMass,num,histogram):
+        super(CheckTMass,self).__init__()
+        self.minMass = minMass
+        self.num = num
+        self.histogram = histogram
+        
+    def check(self,EventObject):
+        etmiss = EventObject["EtMiss"]
+        lepton = EventObject["leptons"][self.num]
+        if AH.WTransverseMass(lepton,etmiss) > self.minMass:
+            return self.histogram
+        else:
+            return False
+            
+    def plot(self,EventObject,histogram,weight):
+        lepton = EventObject["leptons"][self.num]
+        etmiss = EventObject["EtMiss"]
+        histogram.Fill(AH.WTransverseMass(lepton,etmiss),weight)
+            
+
         
         
         

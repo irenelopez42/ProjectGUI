@@ -3,7 +3,7 @@ config = {
 "InputDirectory": "results",
 
 "Histograms" : {
-   # "WtMass"             : {"xtitle" : "m_{T}^{W} [GeV]"},
+    "WtMass"             : {"xtitle" : "m_{T}^{W} [GeV]"},
     "etmiss"             : {"xtitle" : "E_{T}^{Miss} [GeV]"},
     "lep_n"              : {"xndiv" : 10},
     "lep_pt"             : {},
