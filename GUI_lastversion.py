@@ -11,6 +11,8 @@ import threading
 import CheckFileSuper
 import NewRunScript
 import NewPlotResults
+import glob
+import os
 
 window = Tk()
 
@@ -21,7 +23,7 @@ submenu = Menu(menu)
 menu.add_cascade(label="File", menu=submenu)
 
 #Create invisible frames to organize layout
-frame1 = Frame(window, width="30", padx=25, height="450") #where widgets will be
+frame1 = Frame(window, width="300", padx=25, height="450") #where widgets will be
 frame1.pack(side=LEFT)
 frameOUT = Frame(window, width="500", height="450", bg="thistle4") #where plots will show
 frameOUT.pack(side=LEFT)
@@ -33,14 +35,120 @@ frameOUT.pack(side=LEFT)
 nlep_val = IntVar()
 nlep_val.set(0) # initialize a string for number of leptons
 
+
+OptionsLep = Frame(frame1) #Frame to share extra options for leptons
+
+#initialize values for extra options
+LepMom_val = IntVar()
+LepMom_val.set(0)    #Lepton momentum
+LepTmass_val = IntVar()
+LepTmass_val.set(0)  #Lepton transverse mass
+st_lepchargecb = IntVar()
+TwoLepcharge_val = IntVar()
+TwoLepcharge_val.set(1) #2 Leptons: same/diferent charge
+st_lepflavourcb = IntVar()
+TwoLepflavour_val = IntVar()
+TwoLepflavour_val.set(1)  #2 Leptons: same/diferent flavour
+angleLepMP_val = IntVar()
+angleLepMP_val.set(0)  #Angle between miss momentum and lepton
+LeadLepMom_val = IntVar()
+LeadLepMom_val.set(0)    #Lead Lepton momentum
+TrailLepMom_val = IntVar()
+TrailLepMom_val.set(0)    #Trail Lepton momentum
+
+
+b1_LepCharge = Radiobutton(OptionsLep, text="Same charge",
+                        variable=TwoLepcharge_val, value=1)
+b2_LepCharge = Radiobutton(OptionsLep, text="Opposite charge",
+                        variable=TwoLepcharge_val, value=-1)  #Checkboxes for same/opposite charge
+
+def chooseLepcharge():
+    TwoLepcharge_val = IntVar()
+    TwoLepcharge_val.set(1)
+    if  st_lepchargecb.get() == 1:
+        b1_LepCharge.grid(row=1, sticky=W)
+        b2_LepCharge.grid(row=2, sticky=W)
+    else:
+        b1_LepCharge.grid_forget()
+        b2_LepCharge.grid_forget()
+        del TwoLepcharge_val
+
+b1_LepFlavour = Radiobutton(OptionsLep, text="Same flavour",
+                        variable=TwoLepflavour_val, value=1)
+b2_LepFlavour = Radiobutton(OptionsLep, text="Different flavour",
+                        variable=TwoLepflavour_val, value=-1)  #Checkboxes for same/diferent flavour
+
+def chooseLepflavour():
+    TwoLepflavour_val = IntVar()
+    TwoLepflavour_val.set(1)
+    if  st_lepflavourcb.get() == 1:
+        b1_LepFlavour.grid(row=4, sticky=W)
+        b2_LepFlavour.grid(row=5, sticky=W)
+    else:
+        b1_LepFlavour.grid_forget()
+        b2_LepFlavour.grid_forget()
+        del TwoLepflavour_val
+
+
+slider_LepMom = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
+			length=125, width=10, variable = LepMom_val, bg = "lavender",label="Momentum") #Slider for momentum
+slider_LepTMass = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL, 
+			length=125, width=10, variable = LepTmass_val, bg = "lavender",label="Transverse mass") #slider for transverse mass
+chooseLepchargecb = Checkbutton(OptionsLep, text="Choose leptons' charges", bg ="lavender", variable = st_lepchargecb, onvalue=1,offvalue=0, 				command=chooseLepcharge)
+chooseLepflavourcb = Checkbutton(OptionsLep, text="Choose leptons' flavours", bg = "lavender", variable = st_lepflavourcb, onvalue=1,offvalue=0, command=chooseLepflavour)
+slider_angleLepMP = Scale(OptionsLep, from_=0, to=180, orient=HORIZONTAL, 
+			length=170, width=10, variable = angleLepMP_val, bg = "lavender", label="θ between lep and miss P") #slider for angle
+slider_LeadLepMom = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
+			length=170, width=10, variable = LeadLepMom_val, bg = "lavender",label="Lead Lepton Momentum") #Slider for lead lepton momentum
+slider_TrailLepMom = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
+			length=170, width=10, variable = TrailLepMom_val, bg = "lavender",label="Trail Lepton Momentum") #Slider for trail lepton momentum
+
+def clearFrame():    #function to clear all extra options
+    OptionsLep.grid_forget()
+    slider_LepMom.grid_forget()
+    slider_LepTMass.grid_forget()
+    chooseLepchargecb.grid_forget()
+    chooseLepflavourcb.grid_forget()
+    slider_angleLepMP.grid_forget()
+    slider_LeadLepMom.grid_forget()
+    slider_TrailLepMom.grid_forget()
+    LepMom_val.set(0)
+    LepTmass_val.set(0)
+    TwoLepflavour_val.set(1)
+    angleLepMP_val.set(0)
+    TrailLepMom_val.set(0)
+    LeadLepMom_val.set(0)
+
+def extLepOpts():
+    if nlep_val.get() == 1:
+        clearFrame()
+        OptionsLep.grid(row=1, column=2)
+        slider_LepMom.grid(row=0)
+        slider_LepTMass.grid(row=1)
+    if nlep_val.get() == 2:
+        clearFrame()
+        OptionsLep.grid(row=2, column=2)
+        chooseLepchargecb.grid(row=0)
+        chooseLepflavourcb.grid(row=3)
+        slider_angleLepMP.grid(row=6, sticky=W)
+        slider_LeadLepMom.grid(row=7, sticky=W)
+        slider_TrailLepMom.grid(row=8, sticky=W)
+
+    if nlep_val.get() == 3:
+        clearFrame()
+        OptionsLep.grid(row=3, column=2)
+    if nlep_val.get() == 4:
+        clearFrame()
+        OptionsLep.grid(row=4, column=2)
+
 b1_lep = Radiobutton(frame1, text="1 Lepton",
-                        variable=nlep_val, value=1)
+                        variable=nlep_val, value=1, command=extLepOpts)
 b2_lep = Radiobutton(frame1, text="2 Leptons",
-                        variable=nlep_val, value=2)
+                        variable=nlep_val, value=2, command=extLepOpts)
 b3_lep = Radiobutton(frame1, text="3 Leptons",
-                        variable=nlep_val, value=3)
+                        variable=nlep_val, value=3, command=extLepOpts)
 b4_lep = Radiobutton(frame1, text="4 Leptons",
-                        variable=nlep_val, value=4)
+                        variable=nlep_val, value=4, command=extLepOpts)
 
 st_lepcb = IntVar() #State of checkbox
 def chooseNlep(): #function for checkbox
@@ -51,6 +159,7 @@ def chooseNlep(): #function for checkbox
 	b4_lep.grid(row=4)
     else:
 	nlep_val.set(0)
+        clearFrame()
         b1_lep.grid_forget()
 	b2_lep.grid_forget()
 	b3_lep.grid_forget()
@@ -196,11 +305,14 @@ rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue",
              activebackground="Black", fg= "White",activeforeground="White", command=browser)
 rbrowser.grid(row=18)
 
-histograms =[]
 
+## Fuction for analysis
+
+histograms =[]
 
 def run_analysis():
     """runs the analysis"""
+    del histograms[:]
     
     global latestThread
     if latestThread!= None:
@@ -266,10 +378,46 @@ def run_analysis():
     ROOT.gApplication.Terminate(0) 
  
 def plotting():
+    del listphotos[:]
+    del listphotosbig[:]
+    del listcommands[:]
+    del listbuttons[:]
+    del listlabels[:]
+    previousplots=glob.glob('Output/*.png')
+    for i in range(0, len(previousplots)): 
+    	os.remove(previousplots[i])
     global histograms
     if histograms == []:
         return
-    NewPlotResults.plot_results(histograms)   
+    NewPlotResults.plot_results(histograms)
+    plots = glob.glob('Output/*.png')
+    lplots = len(plots)
+    try:
+	    for j in range(0, 6):
+		    for i in range(0,6):
+			    photo = PhotoImage(file= plots[i+j*6])
+			    listphotosbig.insert(i+j*6, photo)
+			    photo2 = photo.subsample(9)
+			    listphotos.insert(i+j*6, photo2)
+			    def showplot(p=i,q=j):
+				    newwin = Toplevel()
+				    bigplot = Label(newwin, compound=BOTTOM,text = plots[p+q*6][7:][:-4], image = listphotosbig[p+q*6])
+				    bigplot.grid()
+			    listcommands.insert(i+j*6, showplot)
+			    listbuttons.insert(i+j*6, Button(frameOUT, command=listcommands[i+j*6], compound=BOTTOM, text=plots[i+j*6][7:][:-4], image=listphotos[i+j*6]))
+			    listbuttons[i+j*6].grid(row=j, column=i)
+
+    except IndexError:
+	    pass
+
+
+#Button to plot results
+
+listphotos = [] #some lists needed
+listphotosbig = []
+listcommands = []
+listbuttons = []
+listlabels = []
     
 plot = Button(frame1, text="Plot Results", font=("Calibri", 10) ,bg="Blue", 
              activebackground="Black", fg= "White",activeforeground="White", command=plotting)
@@ -280,13 +428,8 @@ plot.grid(row=20)
 
 #Button to start analysis
 run = Button(frame1, text="Run Analysis", font=("Calibri",16) ,bg="Green", 
-             activebackground="Black", fg= "White", activeforeground="White",command  = run_analysis)
+             activebackground="Black", fg= "White", activeforeground="White", command = run_analysis)
 run.grid(row=19, columnspan=2, sticky=S)
-
-    
-    
-    
-    
 
 
 window.mainloop()
