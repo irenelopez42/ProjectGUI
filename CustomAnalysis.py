@@ -1,5 +1,5 @@
 import NewBaseAnalysis
-import Analysis.AnalysisHelpers as AH
+import NewAnalysisHelpers as AH
 import NewHistManager as HM
 
 
@@ -32,7 +32,7 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
          jets = AH.selectAndSortContainer(self.Store.getJets(),AH.isGoodJet, lambda p: p.pt())
          EtMiss = self.Store.getEtMiss()
          EventObject = {"eventinfo" :eventinfo, "leptons" : leptons, "jets" : jets, "EtMiss" :EtMiss}
-         self.histValDic = self.histogramValueDictionary(EventObject)
+         self.histValDic = {}
          weight = eventinfo.scalefactor()*eventinfo.eventWeight() if not self.getIsData() else 1		
 		
          for checktype in self.checkList:
@@ -40,13 +40,11 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
             if check== False:
                 return False
             elif check != None:
-                checktype.plot(EventObject,self.histObjDic[check],weight)
+                checktype.add(self.histValDic,EventObject)
                 
-                    
-         keys =self.histValDic.keys()
+         histogramAppend(EventObject,self.histValDic)
+                
          for histogram in self.histograms:
-             if histogram not in keys:
-                 continue
              if not isinstance(self.histValDic[histogram],list):
                  self.histObjDic[histogram].Fill(self.histValDic[histogram],weight)
              else:
@@ -57,54 +55,53 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
 
 
 	def finalize(self):
+		print AH.lep_num
 		HM.writeHist(self.histObjDic)
 
-	def histogramValueDictionary(self,EventObject):
+def histogramAppend(EventObject,histogramDictionary):
 
-		jets = EventObject["jets"]
-		histogramDictionary ={}
-		histogramDictionary["n_jets"] =  len(jets)
+	jets = EventObject["jets"]
+	histogramDictionary["n_jets"] =  len(jets)
 
-		histogramDictionary["jet_pt"]= []
-		histogramDictionary["jet_m"] =[]
-		histogramDictionary["jet_jvf"]=[]
-		histogramDictionary["jet_eta"]=[]
-		histogramDictionary["jet_MV1"] =[]
+	histogramDictionary["jet_pt"]= []
+	histogramDictionary["jet_m"] =[]
+	histogramDictionary["jet_jvf"]=[]
+	histogramDictionary["jet_eta"]=[]
+	histogramDictionary["jet_MV1"] =[]
 
-		for jet in jets:
-			histogramDictionary["jet_pt"].append(jet.pt())
-			histogramDictionary["jet_jvf"].append(jet.jvf())
-			histogramDictionary["jet_m"].append(jet.m())
-			histogramDictionary["jet_eta"].append(jet.eta())
-			histogramDictionary["jet_MV1"].append(jet.mv1())
+	for jet in jets:
+		histogramDictionary["jet_pt"].append(jet.pt())
+		histogramDictionary["jet_jvf"].append(jet.jvf())
+		histogramDictionary["jet_m"].append(jet.m())
+		histogramDictionary["jet_eta"].append(jet.eta())
+		histogramDictionary["jet_MV1"].append(jet.mv1())
 
-		leptons = EventObject["leptons"]
-		histogramDictionary["lep_n"] = len(leptons)
+	leptons = EventObject["leptons"]
+	histogramDictionary["lep_n"] = len(leptons)
 		
-		histogramDictionary["lep_pt"]= []
-		histogramDictionary["lep_eta"] =[]
-		histogramDictionary["lep_phi"]=[]
-		histogramDictionary["lep_E"]=[]
-		histogramDictionary["lep_charge"] =[]
-		histogramDictionary["lep_type"]=[]
+	histogramDictionary["lep_pt"]= []
+	histogramDictionary["lep_eta"] =[]
+	histogramDictionary["lep_phi"]=[]
+	histogramDictionary["lep_E"]=[]
+	histogramDictionary["lep_charge"] =[]
+	histogramDictionary["lep_type"]=[]
 
-		for lepton in leptons:
-			histogramDictionary["lep_pt"].append(lepton.pt())
-			histogramDictionary["lep_eta"].append(lepton.eta())
-			histogramDictionary["lep_phi"].append(lepton.phi())
-			histogramDictionary["lep_E"].append(lepton.e())
-			histogramDictionary["lep_charge"].append(lepton.charge())
-			histogramDictionary["lep_type"].append(lepton.pdgId())
-		if len(leptons) > 0:
+	for lepton in leptons:
+		histogramDictionary["lep_pt"].append(lepton.pt())
+		histogramDictionary["lep_eta"].append(lepton.eta())
+		histogramDictionary["lep_phi"].append(lepton.phi())
+		histogramDictionary["lep_E"].append(lepton.e())
+		histogramDictionary["lep_charge"].append(lepton.charge())
+		histogramDictionary["lep_type"].append(lepton.pdgId())
+	if len(leptons) > 0:
+		leadLepton = leptons[0]		
 
-			leadLepton = leptons[0]		
-
-			histogramDictionary["leadlep_pt"] = leadLepton.pt()
-			histogramDictionary["leadlep_eta"] = leadLepton.eta()
-			histogramDictionary["leadlep_phi"] = leadLepton.phi()
-			histogramDictionary["leadlep_E"] = leadLepton.e()
-			histogramDictionary["leadlep_charge"] = leadLepton.charge()
-			histogramDictionary["leadlep_type"] = leadLepton.pdgId()
+		histogramDictionary["leadlep_pt"] = leadLepton.pt()
+		histogramDictionary["leadlep_eta"] = leadLepton.eta()
+		histogramDictionary["leadlep_phi"] = leadLepton.phi()
+		histogramDictionary["leadlep_E"] = leadLepton.e()
+		histogramDictionary["leadlep_charge"] = leadLepton.charge()
+		histogramDictionary["leadlep_type"] = leadLepton.pdgId()
 
 		if len(leptons) >1:
 			trailLepton = leptons[1]
@@ -117,9 +114,7 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
    
 
 
-		etmiss = EventObject["EtMiss"]
-		histogramDictionary["etmiss"] = etmiss.et()
-
-		return histogramDictionary
+	etmiss = EventObject["EtMiss"]
+	histogramDictionary["etmiss"] = etmiss.et()
 
 
