@@ -13,20 +13,10 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
 		self.histObjDic ={}
 
 	def initialize(self):
-
-		eventinfo = self.Store.getEventInfo()
-		leptons = AH.selectAndSortContainer(self.Store.getLeptons(),AH.isGoodLepton, lambda p: p.pt())
-		jets = AH.selectAndSortContainer(self.Store.getJets(),AH.isGoodJet, lambda p: p.pt())
-		EtMiss = self.Store.getEtMiss()	
-		EventObject = {"eventinfo" :eventinfo, "leptons" : leptons, "jets" : jets, "EtMiss" :EtMiss}
-
 		for histogram in self.histograms:
 			self.histObjDic[histogram] = HM.returnHistogram(histogram)
 
-
-
 	def analyze(self):
-     
          eventinfo = self.Store.getEventInfo()
          leptons = AH.selectAndSortContainer(self.Store.getLeptons(),AH.isGoodLepton, lambda p: p.pt())
          jets = AH.selectAndSortContainer(self.Store.getJets(),AH.isGoodJet, lambda p: p.pt())
@@ -36,12 +26,9 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
          weight = eventinfo.scalefactor()*eventinfo.eventWeight() if not self.getIsData() else 1		
 		
          for checktype in self.checkList:
-            check = checktype.check(EventObject)
-            if check== False:
+            if checktype.check(EventObject,self.histValDic) is False:
                 return False
-            elif check != None:
-                checktype.add(self.histValDic,EventObject)
-                
+                    
          histogramAppend(EventObject,self.histValDic)
                 
          for histogram in self.histograms:
@@ -50,12 +37,10 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
              else:
                  for item in self.histValDic[histogram]:
                      self.histObjDic[histogram].Fill(item,weight)			
-        
          return True
 
 
 	def finalize(self):
-		print AH.lep_num
 		HM.writeHist(self.histObjDic)
 
 def histogramAppend(EventObject,histogramDictionary):

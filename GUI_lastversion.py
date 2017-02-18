@@ -14,6 +14,7 @@ import NewPlotResults
 import NewAnalysisHelpers as AH
 import glob
 import os
+from PIL import Image
 
 window = Tk()
 
@@ -170,7 +171,6 @@ lyes = Checkbutton(frame1, text="Choose number leptons", font=("Calibri",10),bg=
 	variable = st_lepcb, onvalue=1,offvalue=0, command=chooseNlep)
 lyes.grid(row=0,column=0, sticky=W) #Define and show checkbox
 
-
 #Want specific number jets? Enter number.
 
 njet_val = IntVar()
@@ -207,27 +207,27 @@ btaggedyes = Checkbutton(frame1, text="Any b-tagged jets?", bg="LightCyan2",
 st_jetcb = IntVar() #State of checkbox
 def chooseNjet(): #Function for checkbox
     if st_jetcb.get()==1:
-	b0_jet.grid(row=7)
-	b1_jet.grid(row=8)
-	b2_jet.grid(row=9)
-	b3_jet.grid(row=10)
-	b4_jet.grid(row=11)
-	b5_jet.grid(row=12)
-	b6_jet.grid(row=13)
-	btaggedyes.grid(row=14)
+        b0_jet.grid(row=7)   
+        b1_jet.grid(row=8)
+        b2_jet.grid(row=9)
+        b3_jet.grid(row=10)
+        b4_jet.grid(row=11)
+        b5_jet.grid(row=12)
+        b6_jet.grid(row=13)
+        btaggedyes.grid(row=14)
     else:
-	njet_val.set(0)
+        njet_val.set(0)
         b0_jet.grid_forget()
         b1_jet.grid_forget()
-	b2_jet.grid_forget()
-	b3_jet.grid_forget()
-	b4_jet.grid_forget()
-	b5_jet.grid_forget()
-	b6_jet.grid_forget()
-	btaggedyes.grid_forget()
-	st_btagjetcb.set(0)
-	btag_val.set(0)
-	btag_entry.grid_forget()
+        b2_jet.grid_forget()
+        b3_jet.grid_forget()
+        b4_jet.grid_forget()
+        b5_jet.grid_forget()
+        b6_jet.grid_forget()
+        btaggedyes.grid_forget()
+        st_btagjetcb.set(0)
+        btag_val.set(0)
+        btag_entry.grid_forget()
 
 jyes = Checkbutton(frame1, text="Choose number jets", bg="LightCyan2", font=("Calibri",10),
 	 variable = st_jetcb, onvalue=1,offvalue=0, command=chooseNjet)
@@ -254,8 +254,6 @@ lepptyes = Checkbutton(frame1, text="Choose lepton momentum (GeV) (default 25)",
 lepptyes.grid(row=15,column=0, sticky=W) #Define and show checkbutton
 
 #Slider for missing momentum
-
-
 
 missE_val = IntVar()
 missE_val.set(0)
@@ -320,7 +318,6 @@ histograms =[]
 
 def run_analysis():
     """runs the analysis"""
-    del histograms[:]
     
     global latestThread
     if latestThread!= None:
@@ -329,6 +326,9 @@ def run_analysis():
         
     selection = []
     global histograms
+    
+    del histograms[:]
+
     
     histograms.append("n_jets")
     histograms.append("lep_n")
@@ -346,9 +346,9 @@ def run_analysis():
     histograms.append("lep_type")
 
     if st_lepptcb.get()==1:
-	print AH.lep_num
-	AH.lep_num = leppt_val.get()
-	print AH.lep_num
+        print AH.lep_num
+        AH.lep_num = leppt_val.get()
+        print AH.lep_num
     
     if st_jetcb.get() ==1: #number of jets
         jetn_chk = CheckFileSuper.CheckNJets(njet_val.get())
@@ -412,14 +412,19 @@ def run_analysis():
     ROOT.gApplication.Terminate(0) 
  
 def plotting():
+    global listphotos
     del listphotos[:]
+    global listphotosbig
     del listphotosbig[:]
+    global listcommands
     del listcommands[:]
+    global listbuttons
     del listbuttons[:]
+    global listlabels
     del listlabels[:]
     previousplots=glob.glob('Output/*.png')
-    for i in range(0, len(previousplots)): 
-    	os.remove(previousplots[i])
+    for plot in previousplots: 
+        os.remove(plot)
      
     global histograms
     if not histograms == []:

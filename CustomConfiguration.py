@@ -2,7 +2,7 @@ Job = {
     "Batch"           : False,
     "Quiet"           : False,
     "Analysis"        : "CustomAnalysis",
-    "Fraction"        : 1,
+    "Fraction"        : 0.01,
     "MaxEvents"       : 1234567890,
     "OutputDirectory" : "results/"
 }
