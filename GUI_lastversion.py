@@ -14,7 +14,6 @@ import NewPlotResults
 import NewAnalysisHelpers as AH
 import glob
 import os
-from PIL import Image
 
 window = Tk()
 
@@ -419,6 +418,9 @@ def plotting():
     global listcommands
     del listcommands[:]
     global listbuttons
+    if len(listbuttons) > 0:
+        for i in range(0,len(listbuttons)):
+            listbuttons[i].grid_forget()
     del listbuttons[:]
     global listlabels
     del listlabels[:]
