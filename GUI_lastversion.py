@@ -450,7 +450,7 @@ def plotting():
 				    newwin = Toplevel()
 				    scrollbar = Scrollbar(newwin)
 				    scrollbar.pack(side=RIGHT, fill=Y)
-				    canvas = Canvas(newwin, width=900, height=2000, yscrollcommand=scrollbar.set)
+				    canvas = Canvas(newwin, width=900, height=2000, yscrollcommand=scrollbar.set, scrollregion=(0,0,0,850))
 				    canvas.pack()
 				    bigplot = canvas.create_image(450,420, image = listphotosbig[p+q*6])
 				    scrollbar.config(command=canvas.yview)
