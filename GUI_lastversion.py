@@ -270,6 +270,7 @@ jyes = Checkbutton(frame1, text="Choose number jets", bg="LightCyan2", font=("Ca
 	 variable = st_jetcb, onvalue=1,offvalue=0, command=chooseNjet)
 jyes.grid(row=7,column=0, sticky=W) #Define and show checkbox
 
+
 frame1.grid_rowconfigure(8, minsize=30, weight=1)
 frame1.grid_rowconfigure(9, minsize=30, weight=1)
 frame1.grid_rowconfigure(10, minsize=30, weight=1)
@@ -281,6 +282,7 @@ minmissE_val = IntVar() #initialize integer for min
 minmissE_val.set(0)
 maxmissE_val = IntVar() #initialize integer for max
 maxmissE_val.set(0)
+
 
 slider_minmissP = Scale(frame1, label="Minimum:", from_=0, to=100, orient=HORIZONTAL, length=150, variable = minmissE_val) #Define slider
 slider_maxmissP = Scale(frame1, label="Maximum:", from_=0, to=100, orient=HORIZONTAL, length=150, variable = maxmissE_val)
@@ -344,10 +346,12 @@ def browser():
     latestThread.setDaemon(True)
     latestThread.start()
 
+
 #rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
 #             activebackground="Black", fg= "White",activeforeground="White", command=browser)
 #rbrowser.grid(row=19)
 submenu.add_command(label="Root Browser", command=browser)
+
 
 
 ## Fuction for analysis
@@ -509,15 +513,16 @@ plot = Button(frame1, text="Plot Results", font=("Calibri", 10) ,bg="Blue",
 plot.grid(row=21)
 
 
-
 #Button to start analysis
 run = Button(frame1, text="Run Analysis", font=("Calibri",16) ,bg="Green", 
              activebackground="Black", fg= "White", activeforeground="White", command = run_analysis)
 run.grid(row=20, columnspan=2, sticky=S)
 
+
 #Add a few functions to menu
 submenu.add_command(label="Run Analysis", command=run_analysis)
 submenu.add_command(label="Plot Results", command=plotting)
+
 
 
 window.mainloop()
