@@ -27,7 +27,7 @@ menu.add_cascade(label="File", menu=submenu)
 
 #scrollbar = Scrollbar(window)
 #scrollbar.pack(side=RIGHT, fill=Y)
-#canvas = Canvas(window, width=500, height=900, yscrollcommand=scrollbar.set, scrollregion=(0,0,0,900))
+#canvas = Canvas(window, width=1200, height=900, yscrollcommand=scrollbar.set, scrollregion=(0,0,0,900))
 #canvas.pack()
 #scrollbar.config(command=canvas.yview)
 
@@ -302,6 +302,12 @@ minmissPyes.grid(row=11,column=0, sticky=W) #Define and show checkbutton
 
 frame1.grid_rowconfigure(12, minsize=60, weight=1)
 frame1.grid_rowconfigure(13, minsize=60, weight=1)
+
+#Percentage of data to analize
+percentg_val = IntVar()
+percentg_val.set(0)
+PercentgEntry = Scale(frame1, label="Percentage of data to analize:", bg="LightCyan2",from_=0, to=100, orient=HORIZONTAL, length=300, resolution=0.5,variable = percentg_val)
+PercentgEntry.grid(row=14, column=0, columnspan=2)
 
 #Button to open root browser
 
