@@ -56,8 +56,6 @@ TwoLepcharge_val.set(1) #2 Leptons: same/diferent charge
 st_lepflavourcb = IntVar()
 TwoLepflavour_val = IntVar()
 TwoLepflavour_val.set(1)  #2 Leptons: same/diferent flavour
-angleLepMP_val = IntVar()
-angleLepMP_val.set(0)  #Angle between miss momentum and lepton
 InvariantM_val = IntVar()
 InvariantM_val.set(0)    #Invariant mass
 InvariantM2_val = IntVar()
@@ -100,11 +98,9 @@ def chooseLepflavour():
 
 
 slider_LepTMass = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL, 
-			length=125, width=10, variable = LepTmass_val, bg = "lavender",label="Transverse mass") #slider for transverse mass
+			length=170, width=10, variable = LepTmass_val, bg = "lavender",label="Transverse mass") #slider for transverse mass
 chooseLepchargecb = Checkbutton(OptionsLep, text="Choose leptons' charges", bg ="lavender", variable = st_lepchargecb, onvalue=1,offvalue=0, 				command=chooseLepcharge)
 chooseLepflavourcb = Checkbutton(OptionsLep, text="Choose leptons' flavours", bg = "lavender", variable = st_lepflavourcb, onvalue=1,offvalue=0, command=chooseLepflavour)
-slider_angleLepMP = Scale(OptionsLep, from_=0, to=180, orient=HORIZONTAL, 
-			length=170, width=10, variable = angleLepMP_val, bg = "lavender", label="θ between lep and miss P") #slider for angle
 slider_InvariantM = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
 			length=170, width=10, variable = InvariantM_val, bg = "lavender") #Slider for invariant mass
 slider_InvariantM2 = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
@@ -117,7 +113,6 @@ def clearFrame():    #function to clear all extra options
     slider_LepTMass.grid_forget()
     chooseLepchargecb.grid_forget()
     chooseLepflavourcb.grid_forget()
-    slider_angleLepMP.grid_forget()
     slider_InvariantM.grid_forget()
     slider_InvariantM2.grid_forget()
     slider_Range.grid_forget()
@@ -126,7 +121,6 @@ def clearFrame():    #function to clear all extra options
     st_lepflavourcb.set(0)
     chooseLepcharge()
     chooseLepflavour()
-    angleLepMP_val.set(0)
     InvariantM_val.set(0)
     InvariantM2_val.set(0)
     Range_val.set(0)
@@ -141,7 +135,6 @@ def extLepOpts():
         OptionsLep.grid(row=1, column=2, rowspan=5)
         chooseLepchargecb.grid(row=0)
         chooseLepflavourcb.grid(row=3)
-        slider_angleLepMP.grid(row=6, sticky=W)
         slider_InvariantM.config(label="Invariant mass")
         slider_InvariantM.grid(row=7, sticky=W)
 	slider_Range.grid(row=8, sticky=W)
@@ -153,6 +146,7 @@ def extLepOpts():
 	slider_InvariantM.config(label="Invariant mass of best pair")
         slider_InvariantM.grid(row=6, sticky=W)
 	slider_Range.grid(row=7, sticky=W)
+	slider_LepTMass.grid(row=8, sticky=W)
     if nlep_val.get() == 4:
         clearFrame()
         OptionsLep.grid(row=1, column=2, rowspan=5)
@@ -186,7 +180,7 @@ def chooseleppt():  #Function for checkbutton
 	leppt_val.set(0)
 	st_lepptcb.set(0)
 
-lepptyes = Checkbutton(frame1, text="Choose lepton momentum (GeV)\n (default 25)",  
+lepptyes = Checkbutton(frame1, bg="LightCyan2", text="Choose lepton momentum (GeV)\n (default 25)",  
 	variable = st_lepptcb, onvalue=1,offvalue=0, command=chooseleppt)
 
 st_lepcb = IntVar() #State of checkbox
@@ -270,7 +264,6 @@ jyes = Checkbutton(frame1, text="Choose number jets", bg="LightCyan2", font=("Ca
 	 variable = st_jetcb, onvalue=1,offvalue=0, command=chooseNjet)
 jyes.grid(row=7,column=0, sticky=W) #Define and show checkbox
 
-
 frame1.grid_rowconfigure(8, minsize=30, weight=1)
 frame1.grid_rowconfigure(9, minsize=30, weight=1)
 frame1.grid_rowconfigure(10, minsize=30, weight=1)
@@ -282,7 +275,6 @@ minmissE_val = IntVar() #initialize integer for min
 minmissE_val.set(0)
 maxmissE_val = IntVar() #initialize integer for max
 maxmissE_val.set(0)
-
 
 slider_minmissP = Scale(frame1, label="Minimum:", from_=0, to=100, orient=HORIZONTAL, length=150, variable = minmissE_val) #Define slider
 slider_maxmissP = Scale(frame1, label="Maximum:", from_=0, to=100, orient=HORIZONTAL, length=150, variable = maxmissE_val)
@@ -309,7 +301,7 @@ frame1.grid_rowconfigure(13, minsize=60, weight=1)
 percentg_val = IntVar()
 percentg_val.set(0)
 PercentgEntry = Scale(frame1, label="Percentage of data to analize:", bg="LightCyan2",from_=0, to=100, orient=HORIZONTAL, length=300, resolution=0.5,variable = percentg_val)
-PercentgEntry.grid(row=14, column=0, columnspan=2)
+PercentgEntry.grid(row=14, column=0, columnspan=2, sticky=W)
 
 #Button to open root browser
 
@@ -346,12 +338,10 @@ def browser():
     latestThread.setDaemon(True)
     latestThread.start()
 
-
 #rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
 #             activebackground="Black", fg= "White",activeforeground="White", command=browser)
 #rbrowser.grid(row=19)
 submenu.add_command(label="Root Browser", command=browser)
-
 
 
 ## Fuction for analysis
@@ -508,21 +498,22 @@ listcommands = []
 listbuttons = []
 listlabels = []
     
-plot = Button(frame1, text="Plot Results", font=("Calibri", 10) ,bg="Blue", 
+plot = Button(frame1, text="Plot Results", font=("Calibri", 12) ,bg="Blue", 
              activebackground="Black", fg= "White",activeforeground="White", command=plotting)
-plot.grid(row=21)
+plot.grid(row=20, column=1, sticky=W)
+
 
 
 #Button to start analysis
-run = Button(frame1, text="Run Analysis", font=("Calibri",16) ,bg="Green", 
+run = Button(frame1, text="Run Analysis", font=("Calibri",14) ,bg="Green", 
              activebackground="Black", fg= "White", activeforeground="White", command = run_analysis)
-run.grid(row=20, columnspan=2, sticky=S)
+run.grid(row=20, column=0, sticky=E)
 
+frame1.grid_rowconfigure(19, minsize=30, weight=1)
 
 #Add a few functions to menu
 submenu.add_command(label="Run Analysis", command=run_analysis)
 submenu.add_command(label="Plot Results", command=plotting)
-
 
 
 window.mainloop()
