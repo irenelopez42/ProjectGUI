@@ -23,8 +23,16 @@ window.config(menu=menu)
 submenu = Menu(menu)
 menu.add_cascade(label="File", menu=submenu)
 
+#Canvas and scrollbar
+
+#scrollbar = Scrollbar(window)
+#scrollbar.pack(side=RIGHT, fill=Y)
+#canvas = Canvas(window, width=1200, height=900, yscrollcommand=scrollbar.set, scrollregion=(0,0,0,900))
+#canvas.pack()
+#scrollbar.config(command=canvas.yview)
+
 #Create invisible frames to organize layout
-frame1 = Frame(window, width="300", padx=25, height="450") #where widgets will be
+frame1 = Frame(window, width="200", padx=50, height="450") #where widgets will be
 frame1.pack(side=LEFT)
 frameOUT = Frame(window, width="1000", height="900", bg="thistle4") #where plots will show
 frameOUT.pack(side=LEFT)
@@ -50,10 +58,12 @@ TwoLepflavour_val = IntVar()
 TwoLepflavour_val.set(1)  #2 Leptons: same/diferent flavour
 angleLepMP_val = IntVar()
 angleLepMP_val.set(0)  #Angle between miss momentum and lepton
-LeadLepMom_val = IntVar()
-LeadLepMom_val.set(0)    #Lead Lepton momentum
-TrailLepMom_val = IntVar()
-TrailLepMom_val.set(0)    #Trail Lepton momentum
+InvariantM_val = IntVar()
+InvariantM_val.set(0)    #Invariant mass
+InvariantM2_val = IntVar()
+InvariantM2_val.set(0)    #Invariant mass
+Range_val = IntVar()
+Range_val.set(0)    #Range of invariant mass
 
 
 b1_LepCharge = Radiobutton(OptionsLep, text="Same charge",
@@ -95,10 +105,12 @@ chooseLepchargecb = Checkbutton(OptionsLep, text="Choose leptons' charges", bg =
 chooseLepflavourcb = Checkbutton(OptionsLep, text="Choose leptons' flavours", bg = "lavender", variable = st_lepflavourcb, onvalue=1,offvalue=0, command=chooseLepflavour)
 slider_angleLepMP = Scale(OptionsLep, from_=0, to=180, orient=HORIZONTAL, 
 			length=170, width=10, variable = angleLepMP_val, bg = "lavender", label="θ between lep and miss P") #slider for angle
-slider_LeadLepMom = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
-			length=170, width=10, variable = LeadLepMom_val, bg = "lavender",label="Lead Lepton Momentum") #Slider for lead lepton momentum
-slider_TrailLepMom = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
-			length=170, width=10, variable = TrailLepMom_val, bg = "lavender",label="Trail Lepton Momentum") #Slider for trail lepton momentum
+slider_InvariantM = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
+			length=170, width=10, variable = InvariantM_val, bg = "lavender") #Slider for invariant mass
+slider_InvariantM2 = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
+			length=170, width=10, variable = InvariantM2_val, bg = "lavender",label="Invariant mass of 2nd pair") #Slider for invariant mass of 2nd pair (4 leptons case)  
+slider_Range = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
+			length=170, width=10, variable = Range_val, bg = "lavender",label="Range") #Slider for range of invariant mass 
 
 def clearFrame():    #function to clear all extra options
     OptionsLep.grid_forget()
@@ -106,16 +118,18 @@ def clearFrame():    #function to clear all extra options
     chooseLepchargecb.grid_forget()
     chooseLepflavourcb.grid_forget()
     slider_angleLepMP.grid_forget()
-    slider_LeadLepMom.grid_forget()
-    slider_TrailLepMom.grid_forget()
+    slider_InvariantM.grid_forget()
+    slider_InvariantM2.grid_forget()
+    slider_Range.grid_forget()
     LepTmass_val.set(0)
     st_lepchargecb.set(0)
     st_lepflavourcb.set(0)
     chooseLepcharge()
     chooseLepflavour()
     angleLepMP_val.set(0)
-    TrailLepMom_val.set(0)
-    LeadLepMom_val.set(0)
+    InvariantM_val.set(0)
+    InvariantM2_val.set(0)
+    Range_val.set(0)
 
 def extLepOpts():
     if nlep_val.get() == 1:
@@ -124,17 +138,30 @@ def extLepOpts():
         slider_LepTMass.grid(row=0)
     if nlep_val.get() == 2:
         clearFrame()
-        OptionsLep.grid(row=1, column=2, rowspan=4)
+        OptionsLep.grid(row=1, column=2, rowspan=5)
         chooseLepchargecb.grid(row=0)
         chooseLepflavourcb.grid(row=3)
         slider_angleLepMP.grid(row=6, sticky=W)
-
+        slider_InvariantM.config(label="Invariant mass")
+        slider_InvariantM.grid(row=7, sticky=W)
+	slider_Range.grid(row=8, sticky=W)
     if nlep_val.get() == 3:
         clearFrame()
-        OptionsLep.grid(row=3, column=2)
+        OptionsLep.grid(row=1, column=2, rowspan=5)
+	chooseLepchargecb.grid(row=0)
+	chooseLepflavourcb.grid(row=3)
+	slider_InvariantM.config(label="Invariant mass of best pair")
+        slider_InvariantM.grid(row=6, sticky=W)
+	slider_Range.grid(row=7, sticky=W)
     if nlep_val.get() == 4:
         clearFrame()
-        OptionsLep.grid(row=4, column=2)
+        OptionsLep.grid(row=1, column=2, rowspan=5)
+	chooseLepchargecb.grid(row=0)
+	chooseLepflavourcb.grid(row=3)
+	slider_InvariantM.config(label="Invariant mass of 1st pair")
+        slider_InvariantM.grid(row=6, sticky=W)
+        slider_InvariantM2.grid(row=7, sticky=W)
+	slider_Range.grid(row=8, sticky=W)
 
 b1_lep = Radiobutton(frame1, text="1 Lepton",
                         variable=nlep_val, value=1, command=extLepOpts)
@@ -276,6 +303,12 @@ minmissPyes.grid(row=11,column=0, sticky=W) #Define and show checkbutton
 frame1.grid_rowconfigure(12, minsize=60, weight=1)
 frame1.grid_rowconfigure(13, minsize=60, weight=1)
 
+#Percentage of data to analize
+percentg_val = IntVar()
+percentg_val.set(0)
+PercentgEntry = Scale(frame1, label="Percentage of data to analize:", bg="LightCyan2",from_=0, to=100, orient=HORIZONTAL, length=300, resolution=0.5,variable = percentg_val)
+PercentgEntry.grid(row=14, column=0, columnspan=2)
+
 #Button to open root browser
 
 latestThread=None # last opened thread
@@ -311,9 +344,10 @@ def browser():
     latestThread.setDaemon(True)
     latestThread.start()
 
-rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
-             activebackground="Black", fg= "White",activeforeground="White", command=browser)
-rbrowser.grid(row=19)
+#rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
+#             activebackground="Black", fg= "White",activeforeground="White", command=browser)
+#rbrowser.grid(row=19)
+submenu.add_command(label="Root Browser", command=browser)
 
 
 ## Fuction for analysis
@@ -448,12 +482,12 @@ def plotting():
 			    listphotos.insert(i+j*6, photo2)
 			    def showplot(p=i,q=j):
 				    newwin = Toplevel()
-				    scrollbar = Scrollbar(newwin)
-				    scrollbar.pack(side=RIGHT, fill=Y)
-				    canvas = Canvas(newwin, width=900, height=2000, yscrollcommand=scrollbar.set, scrollregion=(0,0,0,850))
-				    canvas.pack()
-				    bigplot = canvas.create_image(450,420, image = listphotosbig[p+q*6])
-				    scrollbar.config(command=canvas.yview)
+				    topscrollbar = Scrollbar(newwin)
+				    topscrollbar.pack(side=RIGHT, fill=Y)
+				    topcanvas = Canvas(newwin, width=900, height=2000, yscrollcommand=topscrollbar.set, scrollregion=(0,0,0,850))
+				    topcanvas.pack()
+				    bigplot = topcanvas.create_image(450,420, image = listphotosbig[p+q*6])
+				    topscrollbar.config(command=topcanvas.yview)
 			    listcommands.insert(i+j*6, showplot)
 			    listbuttons.insert(i+j*6, Button(frameOUT, command=listcommands[i+j*6], compound=BOTTOM, text=plots[i+j*6][7:][:-4], image=listphotos[i+j*6]))
 			    listbuttons[i+j*6].grid(row=j, column=i)
@@ -476,11 +510,14 @@ plot.grid(row=21)
 
 
 
-
 #Button to start analysis
 run = Button(frame1, text="Run Analysis", font=("Calibri",16) ,bg="Green", 
              activebackground="Black", fg= "White", activeforeground="White", command = run_analysis)
 run.grid(row=20, columnspan=2, sticky=S)
+
+#Add a few functions to menu
+submenu.add_command(label="Run Analysis", command=run_analysis)
+submenu.add_command(label="Plot Results", command=plotting)
 
 
 window.mainloop()
