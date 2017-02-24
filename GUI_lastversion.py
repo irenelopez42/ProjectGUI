@@ -14,6 +14,7 @@ import NewPlotResults
 import NewAnalysisHelpers as AH
 import glob
 import os
+import CustomConfiguration
 
 window = Tk()
 
@@ -297,8 +298,7 @@ def choosemissP():  #Function for checkbutton
 minmissPyes = Checkbutton(frame1, text="Missing\n transverse momentum (GeV)", font=("Calibri",10), bg="LightCyan2", 
 	variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
 
-minmissPyes.grid(row=11,column=0, sticky=W) #Define and show checkbutton
-
+minmissPyes.grid(row=11,column=0, sticky=W) #Define and show checkbutton0
 frame1.grid_rowconfigure(12, minsize=60, weight=1)
 frame1.grid_rowconfigure(13, minsize=60, weight=1)
 
@@ -366,6 +366,8 @@ def run_analysis():
     global histograms
     
     del histograms[:]
+    
+    CustomConfiguration.Job["Fraction"] = percentg_val.get()/100.0
 
     
     histograms.append("n_jets")
@@ -388,12 +390,9 @@ def run_analysis():
         histograms.append("jet_eta")
 
     if st_lepptcb.get()==1:
-        print AH.lep_num
         AH.lep_num = leppt_val.get()
-        print AH.lep_num
     
     if st_jetcb.get() ==1: #number of jets
-        print minnjet_val.get()
         jetn_chk = CheckFileSuper.CheckNJets(minnjet_val.get(),maxnjet_val.get())
         selection.append(jetn_chk)
  
@@ -420,47 +419,80 @@ def run_analysis():
             selection.append(checkTMass)
             histograms.append("WtMass")
 	 
-	if nlep_val.get()==2:   
- 	    checkAngle = CheckFileSuper.CheckAngle(angleLepMP_val.get(),"deltaTheta")
-	    selection.append(checkAngle)
-	    histograms.append("deltaTheta")
+        if nlep_val.get()==2:   
+ 	    #checkAngle = CheckFileSuper.CheckAngle(angleLepMP_val.get(),"deltaTheta")
+	    #selection.append(checkAngle)
+	    #histograms.append("deltaTheta")
            
-        if st_lepchargecb.get()!=0: #lepton charge
-            if TwoLepcharge_val.get()==1:
-                twoLepCharge = CheckFileSuper.CheckLepCharge("same",0,1)
-            else:
-                twoLepCharge = CheckFileSuper.CheckLepCharge("different",0,1)
-            selection.append(twoLepCharge)
+           if st_lepchargecb.get()!=0: #lepton charge
+                if TwoLepcharge_val.get()==1:
+                    twoLepCharge = CheckFileSuper.CheckLepCharge("same",0,1)
+                else:
+                    twoLepCharge = CheckFileSuper.CheckLepCharge("different",0,1)
+                selection.append(twoLepCharge)
             
-        if st_lepflavourcb.get()!=0: #lepton flavour
-            if TwoLepflavour_val.get()==1:
-                twoLepFlavour = CheckFileSuper.CheckLepFlavour("same",0,1)    
-            else:
-                twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
-            selection.append(twoLepFlavour)
+           if st_lepflavourcb.get()!=0: #lepton flavour
+               if TwoLepflavour_val.get()==1:
+                   twoLepFlavour = CheckFileSuper.CheckLepFlavour("same",0,1)    
+               else:
+                   twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
+               selection.append(twoLepFlavour)
             
-    if nlep_val.get()==3:
+        if nlep_val.get()==3:
         
-        subselection =[]
+            subselection =[]
         
-        if st_lepchargecb.get()!=0: #lepton charge
-           if TwoLepcharge_val.get()==1:
-               twoLepCharge = CheckFileSuper.CheckLepCharge("same",0,1)
-           else:
-               twoLepCharge = CheckFileSuper.CheckLepCharge("different",0,1)
-           
-           subselection.append(twoLepCharge)
+            if st_lepchargecb.get()!=0: #lepton charge
+                if TwoLepcharge_val.get()==1:
+                    twoLepCharge = CheckFileSuper.CheckLepCharge("same",0,1)
+                else:
+                    twoLepCharge = CheckFileSuper.CheckLepCharge("different",0,1)
+                    
+                subselection.append(twoLepCharge)
        
-        if st_lepflavourcb.get()!=0: #lepton flavour
-           if TwoLepflavour_val.get()==1:
-               twoLepFlavour = CheckFileSuper.CheckLepFlavour("same",0,1)    
-           else:
-               twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
+            if st_lepflavourcb.get()!=0: #lepton flavour
+                if TwoLepflavour_val.get()==1:
+                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("same",0,1)    
+                else:
+                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
                
-           subselection.append(twoLepFlavour)
-           
-        invMass = CheckFileSuper.Chec
+                subselection.append(twoLepFlavour)
+                
+            threeLepton = CheckFileSuper.CheckThreeLepton("invMass",InvariantM_val.get(),Range_val.get(),
+                                               LepTmass_val.get(),"WtMass", subselection)                                               
+            selection.append(threeLepton)
             
+            histograms.append("WtMass")
+            histograms.append("invMass")
+            
+        if nlep_val.get() == 4:
+            print "newtest"
+            
+            subselection =[]
+        
+            if st_lepchargecb.get()!=0: #lepton charge
+                if TwoLepcharge_val.get()==1:
+                    twoLepCharge = CheckFileSuper.CheckLepCharge("same",0,1)
+                else:
+                    twoLepCharge = CheckFileSuper.CheckLepCharge("different",0,1)
+                    
+                subselection.append(twoLepCharge)
+       
+            if st_lepflavourcb.get()!=0: #lepton flavour
+                if TwoLepflavour_val.get()==1:
+                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("same",0,1)    
+                else:
+                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
+               
+                subselection.append(twoLepFlavour)
+                
+            fourLepton =CheckFileSuper.CheckFourLepton("invMass","invMass2",
+                                                       InvariantM_val.get(),InvariantM2_val.get(),Range_val.get(),subselection)
+
+            selection.append(fourLepton)
+            
+            histograms.append("invMass")
+            histograms.append("invMass2")
             
         
             

@@ -25,6 +25,11 @@ config = {
     "traillep_charge"      : {"y_margin" : 1, "xndiv" : 4},
     "traillep_type"        : {"y_margin" : 0.5, "xtitle" : "|PDG id|^{traillep}"},
     "deltaTheta" 	 : {},
+    "invMass"              : {"xtitle" : "m_{ll} [GeV]"},
+    "invMass2"              : {"xtitle" : "m_{ll} [GeV]"},
+    "WtMass"          : {"xtitle" : "m_{T}^{W} [GeV]"},
+
+
    
    # "lep_ptconerel30"    : {},
    # "lep_etconerel20"    : {},

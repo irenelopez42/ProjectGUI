@@ -52,6 +52,7 @@ def getStandardHistogram(name):
                                         
     if (name == "WtMass"):            return ROOT.TH1D("WtMass",            "Transverse Mass M_{T} [GeV]; Events", 40, 0, 200)
     if (name == "invMass"):           return ROOT.TH1D("invMass",           "Invariant Mass;M_{ll} [GeV]; Events", 30, -30,120)
-    if (name =="deltaTheta"): 	      return ROOT.TH1D("deltaTheta", "Angle Between Lepton and Missing Momentum;#theta^{lepton,miss};",100,-5,5)
+    if (name == "invMass2"):           return ROOT.TH1D("invMass2",           "Invariant Mass of second;M_{ll} [GeV]; Events", 30, -30,120)    
+    if (name =="deltaTheta"): 	      return ROOT.TH1D("deltaTheta", "Angle Between Lepton and Missing Momentum;#theta^{lepton,miss};",100,0,3.2)
     
     return None
