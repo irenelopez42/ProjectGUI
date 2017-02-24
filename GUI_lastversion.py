@@ -106,7 +106,7 @@ slider_InvariantM = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
 slider_InvariantM2 = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
 			length=170, width=10, variable = InvariantM2_val, bg = "lavender",label="Invariant mass of 2nd pair") #Slider for invariant mass of 2nd pair (4 leptons case)  
 slider_Range = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
-			length=170, width=10, variable = Range_val, bg = "lavender",label="Range") #Slider for range of invariant mass 
+			length=170, width=10, variable = Range_val, bg = "lavender",label="Range of invariant mass") #Slider for range of invariant mass 
 
 def clearFrame():    #function to clear all extra options
     OptionsLep.grid_forget()
@@ -221,10 +221,10 @@ labelmaxjet= Label(frame1, text="Maximum:")
 minnjet_val = IntVar()
 minnjet_val.set(0) # initialize integer for min number of jets
 maxnjet_val = IntVar()
-maxnjet_val.set(0) # initialize integer for max number of jets
+maxnjet_val.set(9) # initialize integer for max number of jets
 
-minjet_entry = Spinbox(frame1, textvariable=minnjet_val, from_=0, to=6, width=4) #Entry for min number of jets
-maxjet_entry = Spinbox(frame1, textvariable=maxnjet_val, from_=0, to=6, width=4) #Entry for max number of jets
+minjet_entry = Spinbox(frame1, textvariable=minnjet_val, from_=0, to=9, width=4) #Entry for min number of jets
+maxjet_entry = Spinbox(frame1, textvariable=maxnjet_val, from_=0, to=9, width=4) #Entry for max number of jets
 
 btag_val = IntVar()
 btag_entry = Spinbox(frame1, textvariable=btag_val, from_=0, to=6, width=4) #Entry for number of b-tagged jets
@@ -243,18 +243,18 @@ btaggedyes = Checkbutton(frame1, text="Any b-tagged jets?", bg="LightCyan2",
 st_jetcb = IntVar() #State of checkbox
 def chooseNjet(): #Function for checkbox
     if st_jetcb.get()==1:
-	labelminjet.grid(row=8)
-	labelmaxjet.grid(row=9)
-	minjet_entry.grid(row=8, column=1)
-	maxjet_entry.grid(row=9, column=1)
-        btaggedyes.grid(row=10)
+     labelminjet.grid(row=8)
+     labelmaxjet.grid(row=9)
+     minjet_entry.grid(row=8, column=1)
+     maxjet_entry.grid(row=9, column=1)
+     btaggedyes.grid(row=10)
     else:
         minnjet_val.set(0)
-	maxnjet_val.set(0)
-	labelminjet.grid_forget()
-	labelmaxjet.grid_forget()
-	minjet_entry.grid_forget()
-	maxjet_entry.grid_forget()
+        maxnjet_val.set(9)
+        labelminjet.grid_forget()
+        labelmaxjet.grid_forget()
+        minjet_entry.grid_forget()
+        maxjet_entry.grid_forget()
         btaggedyes.grid_forget()
         st_btagjetcb.set(0)
         btag_val.set(0)
@@ -274,10 +274,10 @@ frame1.grid_rowconfigure(10, minsize=30, weight=1)
 minmissE_val = IntVar() #initialize integer for min
 minmissE_val.set(0)
 maxmissE_val = IntVar() #initialize integer for max
-maxmissE_val.set(0)
+maxmissE_val.set(200)
 
-slider_minmissP = Scale(frame1, label="Minimum:", from_=0, to=100, orient=HORIZONTAL, length=150, variable = minmissE_val) #Define slider
-slider_maxmissP = Scale(frame1, label="Maximum:", from_=0, to=100, orient=HORIZONTAL, length=150, variable = maxmissE_val)
+slider_minmissP = Scale(frame1, label="Minimum:", from_=0, to=200, orient=HORIZONTAL, length=200, variable = minmissE_val) #Define slider
+slider_maxmissP = Scale(frame1, label="Maximum:", from_=0, to=200, orient=HORIZONTAL, length=200, variable = maxmissE_val)
 
 st_missPcb= IntVar() #Checkbutton state
 def choosemissP():  #Function for checkbutton
@@ -288,7 +288,7 @@ def choosemissP():  #Function for checkbutton
         slider_minmissP.grid_forget()
         minmissE_val.set(0)
 	slider_maxmissP.grid_forget()
-        maxmissE_val.set(0)
+        maxmissE_val.set(200)
 
 minmissPyes = Checkbutton(frame1, text="Missing\n transverse momentum (GeV)", font=("Calibri",10), bg="LightCyan2", 
 	variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
@@ -364,12 +364,10 @@ def run_analysis():
     
     histograms.append("n_jets")
     histograms.append("lep_n")
-    histograms.append("etmiss")
     
-    histograms.append("jet_pt")
-    histograms.append("jet_m")
-    histograms.append("jet_eta")
-
+    if minmissE_val.get()<=maxmissE_val.get() or maxmissE_val.get()!=0:
+        histograms.append("etmiss")
+    
     histograms.append("lep_pt")
     histograms.append("lep_eta")
     histograms.append("lep_phi")
@@ -377,13 +375,20 @@ def run_analysis():
     histograms.append("lep_charge")
     histograms.append("lep_type")
 
+    if minnjet_val.get()<=maxnjet_val.get() or maxnjet_val.get()!=0:
+               
+        histograms.append("jet_pt")
+        histograms.append("jet_m")
+        histograms.append("jet_eta")
+
     if st_lepptcb.get()==1:
         print AH.lep_num
         AH.lep_num = leppt_val.get()
         print AH.lep_num
     
     if st_jetcb.get() ==1: #number of jets
-        jetn_chk = CheckFileSuper.CheckNJets(njet_val.get())
+        print minnjet_val.get()
+        jetn_chk = CheckFileSuper.CheckNJets(minnjet_val.get(),maxnjet_val.get())
         selection.append(jetn_chk)
  
         
@@ -428,16 +433,41 @@ def run_analysis():
                 twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
             selection.append(twoLepFlavour)
             
-        if nlep_val.get()>1:
-            histograms.append("traillep_pt")
-            histograms.append("traillep_eta")
-            histograms.append("traillep_E")
-            histograms.append("traillep_phi")
-            histograms.append("traillep_charge")
-            histograms.append("traillep_type")
+    if nlep_val.get()==3:
+        
+        subselection =[]
+        
+        if st_lepchargecb.get()!=0: #lepton charge
+           if TwoLepcharge_val.get()==1:
+               twoLepCharge = CheckFileSuper.CheckLepCharge("same",0,1)
+           else:
+               twoLepCharge = CheckFileSuper.CheckLepCharge("different",0,1)
+           
+           subselection.append(twoLepCharge)
+       
+        if st_lepflavourcb.get()!=0: #lepton flavour
+           if TwoLepflavour_val.get()==1:
+               twoLepFlavour = CheckFileSuper.CheckLepFlavour("same",0,1)    
+           else:
+               twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
+               
+           subselection.append(twoLepFlavour)
+           
+        invMass = CheckFileSuper.Chec
+            
+            
+        
+            
+    if nlep_val.get()>1:
+        histograms.append("traillep_pt")
+        histograms.append("traillep_eta")
+        histograms.append("traillep_E")
+        histograms.append("traillep_phi")
+        histograms.append("traillep_charge")
+        histograms.append("traillep_type")
     
     if st_missPcb.get()==1: #missing momentum
-        missE_chk = CheckFileSuper.CheckEtMiss(missE_val.get())
+        missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),maxmissE_val.get())
         selection.append(missE_chk)
      
     NewRunScript.run(selection,histograms)

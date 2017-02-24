@@ -14,13 +14,14 @@ class CheckFile(object):
 class CheckNJets(CheckFile):
     """checking the number of jets"""
     
-    def __init__(self, nJets):
+    def __init__(self, nMinJets,nMaxJets):
         super(CheckNJets,self).__init__()
-        self.nJets = nJets
+        self.nMinJets = nMinJets
+        self.nMaxJets = nMaxJets
 
     def check(self,EventObject):
         goodJets = EventObject["jets"]
-        if not len(goodJets)==self.nJets:
+        if len(goodJets)<self.nMinJets or len(goodJets) > self.nMaxJets:
             return False
 	
 	return True
@@ -55,13 +56,14 @@ class CheckNLep(CheckFile):
 class CheckEtMiss(CheckFile):
     """checking the minimum transverse missing momentum"""
     
-    def __init__(self,EtMiss):
+    def __init__(self,EtMissMin,EtMissMax):
         super(CheckEtMiss,self).__init__()
-        self.etmiss = EtMiss
+        self.etmissMin = EtMissMin
+        self.etmissMax = EtMissMax
         
     def check(self,EventObject):
         EtMiss = EventObject["EtMiss"]
-        if self.etmiss >= EtMiss.et():
+        if self.etmissMin > EtMiss.et() or self.etmissMax < EtMiss.et():
             return False
         return True
         
