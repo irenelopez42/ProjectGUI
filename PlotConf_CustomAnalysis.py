@@ -3,7 +3,7 @@ config = {
 "InputDirectory": "results",
 
 "Histograms" : {
-   # "WtMass"             : {"xtitle" : "m_{T}^{W} [GeV]"},
+    "WtMass"             : {"xtitle" : "m_{T}^{W} [GeV]"},
     "etmiss"             : {"xtitle" : "E_{T}^{Miss} [GeV]"},
     "lep_n"              : {"xndiv" : 10},
     "lep_pt"             : {},
@@ -24,6 +24,7 @@ config = {
     "traillep_phi"         : {"y_margin" : 1},
     "traillep_charge"      : {"y_margin" : 1, "xndiv" : 4},
     "traillep_type"        : {"y_margin" : 0.5, "xtitle" : "|PDG id|^{traillep}"},
+    "deltaTheta" 	 : {},
    
    # "lep_ptconerel30"    : {},
    # "lep_etconerel20"    : {},

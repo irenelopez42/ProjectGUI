@@ -243,11 +243,12 @@ btaggedyes = Checkbutton(frame1, text="Any b-tagged jets?", bg="LightCyan2",
 st_jetcb = IntVar() #State of checkbox
 def chooseNjet(): #Function for checkbox
     if st_jetcb.get()==1:
-     labelminjet.grid(row=8)
-     labelmaxjet.grid(row=9)
-     minjet_entry.grid(row=8, column=1)
-     maxjet_entry.grid(row=9, column=1)
-     btaggedyes.grid(row=10)
+        labelminjet.grid(row=8)
+        labelmaxjet.grid(row=9)
+        minjet_entry.grid(row=8, column=1)
+        maxjet_entry.grid(row=9, column=1)
+        btaggedyes.grid(row=10)
+
     else:
         minnjet_val.set(0)
         maxnjet_val.set(9)
@@ -262,11 +263,13 @@ def chooseNjet(): #Function for checkbox
 
 jyes = Checkbutton(frame1, text="Choose number jets", bg="LightCyan2", font=("Calibri",10),
 	 variable = st_jetcb, onvalue=1,offvalue=0, command=chooseNjet)
+
 jyes.grid(row=7,column=0, sticky=W) #Define and show checkbox
 
 frame1.grid_rowconfigure(8, minsize=30, weight=1)
 frame1.grid_rowconfigure(9, minsize=30, weight=1)
 frame1.grid_rowconfigure(10, minsize=30, weight=1)
+
 
 
 #Sliders for missing momentum
@@ -282,6 +285,7 @@ slider_maxmissP = Scale(frame1, label="Maximum:", from_=0, to=200, orient=HORIZO
 st_missPcb= IntVar() #Checkbutton state
 def choosemissP():  #Function for checkbutton
     if st_missPcb.get()==1:
+
         slider_minmissP.grid(row=12, column=0) #If state 1, show slider
 	slider_maxmissP.grid(row=13, column=0)
     else:
@@ -292,6 +296,7 @@ def choosemissP():  #Function for checkbutton
 
 minmissPyes = Checkbutton(frame1, text="Missing\n transverse momentum (GeV)", font=("Calibri",10), bg="LightCyan2", 
 	variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
+
 minmissPyes.grid(row=11,column=0, sticky=W) #Define and show checkbutton
 
 frame1.grid_rowconfigure(12, minsize=60, weight=1)
@@ -337,6 +342,7 @@ def browser():
     latestThread =browser_thread()
     latestThread.setDaemon(True)
     latestThread.start()
+
 
 #rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
 #             activebackground="Black", fg= "White",activeforeground="White", command=browser)
@@ -530,6 +536,7 @@ listlabels = []
     
 plot = Button(frame1, text="Plot Results", font=("Calibri", 12) ,bg="Blue", 
              activebackground="Black", fg= "White",activeforeground="White", command=plotting)
+
 plot.grid(row=20, column=1, sticky=W)
 
 
@@ -537,6 +544,7 @@ plot.grid(row=20, column=1, sticky=W)
 #Button to start analysis
 run = Button(frame1, text="Run Analysis", font=("Calibri",14) ,bg="Green", 
              activebackground="Black", fg= "White", activeforeground="White", command = run_analysis)
+
 run.grid(row=20, column=0, sticky=E)
 
 frame1.grid_rowconfigure(19, minsize=30, weight=1)
