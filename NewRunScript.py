@@ -10,6 +10,7 @@ import importlib
 import NewJob 
 import CustomConfiguration
 from multiprocessing import Pool 
+import pathos.multiprocessing as mp
 
 def buildProcessingDict(configuration, samples):
     if samples == "": 
@@ -68,14 +69,14 @@ def run(listChecker,histograms):
     processingDict = CustomConfiguration.Processes
     print CustomConfiguration.Job["Fraction"]
 
-    if (False):
-        configuration.Job["Batch"] = True
-        jobs = [BuildJob(CustomConfiguration.Job, processName, fileLocation) for processName, fileLocation in processingDict.items()]
-        jobs = SortJobsBySize(jobs)
-        pool = Pool(processes=args.nWorkers)              # start with n worker processes
-        pool.map(RunJob, jobs, chunksize=1)
+    
+    CustomConfiguration.Job["Batch"] = True
+    jobs = [BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms) for processName, fileLocation in processingDict.items()]
+    jobs = SortJobsBySize(jobs)
+    pool = mp.ProcessingPool(4)              # start with n worker processes
+    pool.map(RunJob, jobs)
 
-    else:
-        for processName, fileLocation in processingDict.items():
-            RunJob(BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms)) 
+    #else:
+        #for processName, fileLocation in processingDict.items():
+         #   RunJob(BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms)) 
   
