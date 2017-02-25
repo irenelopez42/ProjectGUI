@@ -66,6 +66,7 @@ def run(listChecker,histograms):
   
     #checkAnalysis(configuration, args.analysis)
     processingDict = CustomConfiguration.Processes
+    print CustomConfiguration.Job["Fraction"]
 
     if (False):
         configuration.Job["Batch"] = True

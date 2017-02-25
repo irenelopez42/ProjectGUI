@@ -157,9 +157,9 @@ def InvariantMass(lepton1,lepton2):
 def TestLeptonCandidate(lepton1,lepton2,mass):
     return abs(InvariantMass(lepton1,lepton2)-mass)
     
-def TestDoubleLepton(lepton1,lepton2,lepton3,lepton4,mass):
-    return abs(InvariantMass(lepton1,lepton2)-mass)
-    +abs(InvariantMass(lepton3,lepton4)-mass)
+def TestDoubleLepton(lepton1,lepton2,lepton3,lepton4,mass1,mass2):
+    return abs(InvariantMass(lepton1,lepton2)-mass1)
+    +abs(InvariantMass(lepton3,lepton4)-mass2)
         
 class CheckInvMass(CheckFile):
     
@@ -194,7 +194,6 @@ def BestThreeCandidate(EventObject,histogramDic,mass,checks):
             if not check.check(EventObject,histogramDic):
                 break
         if bestCandidate is None:
-            print "yo"
             bestCandidate = p
             previousCandidate = TestLeptonCandidate(leptons[p[0]],leptons[p[1]],mass)
             
@@ -216,6 +215,7 @@ class CheckThreeLepton(CheckFile):
         self.minMass = minMass
         self.histogram = histogram
         self.Thistogram = Thistogram
+        
 
     def check(self,EventObject,histogramDic):
         bestThree = BestThreeCandidate(EventObject,histogramDic,self.mass,self.checks)
@@ -238,7 +238,7 @@ class CheckThreeLepton(CheckFile):
 def BestFourCandidate(EventObject,histogramDic,mass1,mass2,checks):
     bestCandidate = None
     leptons = EventObject["leptons"]
-    for p in itertools.permutations([0,1,2,3],3):
+    for p in itertools.permutations([0,1,2,3],4):
         for checktype in checks:
             checktype.first = p[0]
             checktype.second = p[1]
@@ -251,14 +251,14 @@ def BestFourCandidate(EventObject,histogramDic,mass1,mass2,checks):
         if bestCandidate is None:
             bestCandidate = p
             previousCandidate = TestDoubleLepton(leptons[p[0]],leptons[p[1]],
-                                                     leptons[p[2]],leptons[p[3]],mass1)
+                                                     leptons[p[2]],leptons[p[3]],mass1,mass2)
             
         currentCandidate = TestDoubleLepton(leptons[p[0]],leptons[p[1]],
-                                                leptons[p[2]],leptons[p[3]],mass2)           
+                                                leptons[p[2]],leptons[p[3]],mass1,mass2)           
         if currentCandidate <previousCandidate:
             bestCandidate = p
             previousCandidate = currentCandidate
-        return bestCandidate
+    return bestCandidate
     
 class CheckFourLepton(CheckFile):
     """gets the best candidate for four leptons"""
@@ -270,10 +270,10 @@ class CheckFourLepton(CheckFile):
         self.histogram1 = histogram1
         self.histogram2 = histogram2
         self.checks = checks
+        self.count = 0
         
     def check(self,EventObject,histogramDic):
         candidate = BestFourCandidate(EventObject,histogramDic,self.mass1,self.mass2,self.checks)
-        print "test"
         if candidate is None: 
             return False
             
@@ -285,7 +285,11 @@ class CheckFourLepton(CheckFile):
         if InvCheck2.check(EventObject,histogramDic) is False:
             return False
             
+        print self.count
+        self.count = self.count + 1 
+        print self.count
         return True
+        
 
   
 	
