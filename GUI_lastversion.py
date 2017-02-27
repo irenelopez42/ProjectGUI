@@ -17,6 +17,8 @@ import os
 import CustomConfiguration
 import NewJob
 import stopping
+import ttk
+import time
 
 window = Tk()
 
@@ -442,6 +444,23 @@ abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red",
              activebackground="Black", fg= "White", activeforeground="White",command = abort
              )
 
+#Progress bar
+MAX = 30
+progress_var = DoubleVar()
+progressbar = ttk.Progressbar(frame1, variable=progress_var, maximum=MAX)
+
+def loop_function():
+
+    k = 0
+    while k <= MAX:
+    ### this moves the progress bar
+        progress_var.set(k)
+        k += 1
+        time.sleep(0.02)
+        window.update_idletasks()
+    window.after(100, loop_function) 
+
+
 histograms =[]
 
 analyser = None
@@ -609,9 +628,6 @@ def run_analysis():
     
     analyser.run(selection,histograms)
             
-    abortb.grid_forget()
-    plotb.grid(row=20, sticky=E) 
-    run.config(command = run_a)
     global listphotos
     del listphotos[:]
     global listphotosbig
@@ -631,6 +647,9 @@ def run_analysis():
 
     if not histograms == []:
         NewPlotResults.plot_results(histograms)
+    progressbar.grid_forget()
+    abortb.grid_forget()
+    plotb.grid(row=20, sticky=E) 
     
 class run_thread(threading.Thread):
     """thread for opening a TBrowser"""
@@ -650,7 +669,9 @@ def run_a():
     the previous one"""  
     abortb.grid(row=20)
     plotb.grid_forget()  
-    
+    progressbar.grid(row=21)
+    loop_function()    
+
     global latestThread
     latestThread =run_thread()
     latestThread.setDaemon(True)
