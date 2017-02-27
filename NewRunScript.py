@@ -58,7 +58,7 @@ class Analyser(object):
     def __init__(self):
         super(Analyser,self).__init__()
         self.jobs = None
-        self.stopping = st.stopping()
+        self.stopping = True
 
     def run(self,listChecker,histograms):
          """
@@ -83,10 +83,10 @@ class Analyser(object):
 
         
          CustomConfiguration.Job["Batch"] = True
-         jobs = [BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms,self.stopping) for processName, fileLocation in processingDict.items()]
-         jobs = SortJobsBySize(jobs)
+         self.jobs = [BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms,self.stopping) for processName, fileLocation in processingDict.items()]
+         self.jobs = SortJobsBySize(self.jobs)
          pool = mp.ProcessingPool(4)              # start with n worker processes
-         pool.map(RunJob, jobs)
+         pool.map(RunJob, self.jobs)
 
     #else:
         #for processName, fileLocation in processingDict.items():

@@ -376,6 +376,7 @@ class browser_thread(threading.Thread):
 
 class analysis_thread(threading.Thread):
     def __init__(self):
+        self.exit = threading.Event()
         threading.Thread.__init__(self)
     
     def run(self):
@@ -384,13 +385,12 @@ class analysis_thread(threading.Thread):
     def stop(self):
         NewJob.NewJob.doNotStop = False
         print NewJob.NewJob.doNotStop, "he"
+    
+    def shutdown(self):
+        self.exit.set()
         
 def abort():
-    global analyser
-    print analyser.stopping.doNotStop    
-    analyser.stopping.doNotStop = False
-
-    
+    latestThread.shutdown()
         
 def create_analysis():
     
@@ -636,6 +636,7 @@ class run_thread(threading.Thread):
     """thread for opening a TBrowser"""
     
     def __init__(self):
+        self.exit = threading.Event()
         threading.Thread.__init__(self)
         
     def run(self):
@@ -644,6 +645,13 @@ class run_thread(threading.Thread):
     def stop(self):
         global stopper
         stopper.stop()
+        
+
+    def shutdown(self):
+        self.exit.set()
+        
+    
+    
 
 def run_a():
     """creates new browser_thread closing

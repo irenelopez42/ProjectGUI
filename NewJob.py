@@ -64,7 +64,7 @@ class NewJob(object):
       self.finalize()
       
     def initialize(self):
-      if self.st.doNotStop:
+      if self.st:
           self.OutputFile = ROOT.TFile.Open(self.OutputFileLocation + ".root","RECREATE")
           self.InputTree = self.setupTree()
           self.Analysis  = self.createAnalysis(self.Configuration["Analysis"])
@@ -73,18 +73,18 @@ class NewJob(object):
         
     def execute(self):
       n=0
-      while self.st.doNotStop and n < self.MaxEvents:
+      while self.st and n < self.MaxEvents:
         self.InputTree.GetEntry(n)
         self.Analysis.doAnalysis()
         n = n+1
             
     def finalize(self):
-      if self.st.doNotStop:
+      if self.st:
           self.Analysis.doFinalization()
       if self.OutputFile!= None:
           self.OutputFile.Close()
     
-      print self.st.doNotStop
+      print self.st
 
 
     # Helper functions
