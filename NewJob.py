@@ -22,6 +22,8 @@ class NewJob(object):
 
     doNotStop = True
     
+    
+    
     def __init__(self, processName, configuration, inputLocation,list_check,histograms):
         super(NewJob, self).__init__()
         #Configurables

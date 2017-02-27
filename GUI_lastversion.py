@@ -377,15 +377,17 @@ class analysis_thread(threading.Thread):
     def run(self):
         run_analysis()
         
+    def stop(self):
+        NewJob.doNotStop = False
+        
 def abort():
-    global analysis
-    analysis.end()
+    global analysisThread
+    analysisThread.stop()
         
         
 def create_analysis():
     
-    st.doNotStop = True
-    
+        
     global analysisThread
     analysisThread =  analysis_thread()
     analysisThread.setDaemon(True)
@@ -428,7 +430,7 @@ test = Button(frame1, text="TEST", font=("Calibri",12) ,bg="White",
 
 #Abort button (doesn't do anything at the moment)
 abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red", 
-             activebackground="Black", fg= "White", activeforeground="White")
+             activebackground="Black", fg= "White", activeforeground="White",command = abort)
 
 histograms =[]
 
