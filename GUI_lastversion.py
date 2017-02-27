@@ -28,13 +28,13 @@ menu.add_cascade(label="File", menu=submenu)
 
 scrollbar = Scrollbar(window)
 scrollbar.pack(side=RIGHT, fill=Y)
-canvas = Canvas(window, width=1300, height=900, yscrollcommand=scrollbar.set, scrollregion=(0,0,0,850))
+canvas = Canvas(window, width=1300, height=900, yscrollcommand=scrollbar.set, scrollregion=(0,0,0,890))
 canvas.pack()
 scrollbar.config(command=canvas.yview)
 
 #Create invisible frames to organize layout
 frame1 = Frame(window, width="200", padx=50) #where widgets will be
-canvas.create_window(210,410, window=frame1)
+canvas.create_window(210,430, window=frame1)
 frameOUT = Frame(window, width="870", height="900", bg="thistle4") #where plots will show
 canvas.create_window(850,410, window=frameOUT)
 
@@ -100,11 +100,15 @@ def chooseLepflavour():
 
 slider_InvariantM = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
 			length=170, width=10, variable = InvariantM_val, bg = "lavender") #Slider for invariant mass
+slider_Range = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
+			length=170, width=10, variable = Range_val, bg = "lavender",label="Range of invariant mass") #Slider for range of invariant mass 
 def chooseInvMass():
     if st_InvMasscb.get() == 1:
 	slider_InvariantM.grid(row=8, sticky=W)
+	slider_Range.grid(row=9, sticky=W)
     else:
 	slider_InvariantM.grid_forget()
+	slider_Range.grid_forget()
 
 
 slider_LepTMass = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL, 
@@ -115,8 +119,7 @@ chooseInvMass = Checkbutton(OptionsLep, bg="lavender", text="Choose invariant ma
 	variable = st_InvMasscb, onvalue=1,offvalue=0, command=chooseInvMass)
 slider_InvariantM2 = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
 			length=170, width=10, variable = InvariantM2_val, bg = "lavender",label="Invariant mass of 2nd pair") #Slider for invariant mass of 2nd pair (4 leptons case)  
-slider_Range = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
-			length=170, width=10, variable = Range_val, bg = "lavender",label="Range of invariant mass") #Slider for range of invariant mass 
+
 
 def clearFrame():    #function to clear all extra options
     OptionsLep.grid_forget()
@@ -130,7 +133,7 @@ def clearFrame():    #function to clear all extra options
     LepTmass_val.set(0)
     st_lepchargecb.set(0)
     st_lepflavourcb.set(0)
-    st_lepflavourcb.set(0)
+    st_InvMasscb.set(0)
     chooseLepcharge()
     chooseLepflavour()
     InvariantM_val.set(0)
@@ -150,7 +153,6 @@ def extLepOpts():
         chooseLepchargecb.grid(row=0)
         chooseLepflavourcb.grid(row=3)
         chooseInvMass.grid(row=7, sticky=W)
-	slider_Range.grid(row=9, sticky=W)
     if nlep_val.get() == 3:
         clearFrame()
         OptionsLep.grid(row=1, column=1, rowspan=5)
@@ -230,6 +232,7 @@ frame1.grid_rowconfigure(4, minsize=50, weight=1)
 frame1.grid_rowconfigure(5, minsize=50, weight=1)
 frame1.grid_rowconfigure(6, minsize=50, weight=1)
 frame1.grid_rowconfigure(7, minsize=50, weight=1)
+frame1.grid_columnconfigure(1, minsize=180, weight=1)
 
 #Want specific number jets? Enter number.
 
@@ -244,15 +247,28 @@ maxnjet_val.set(9) # initialize integer for max number of jets
 minjet_entry = Spinbox(frame1, textvariable=minnjet_val, from_=0, to=9, width=4) #Entry for min number of jets
 maxjet_entry = Spinbox(frame1, textvariable=maxnjet_val, from_=0, to=9, width=4) #Entry for max number of jets
 
-btag_val = IntVar()
-btag_entry = Spinbox(frame1, textvariable=btag_val, from_=0, to=6, width=4) #Entry for number of b-tagged jets
+btagmin_val = IntVar()
+btagmin_val.set(0) #Initialise minimum b-jets
+btagmin_entry = Spinbox(frame1, textvariable=btagmin_val, from_=0, to=9, width=4) #Entry for minimum number of b-tagged jets
+btagmax_val = IntVar()
+btagmax_val.set(9) #Initialise maximum b-jets
+btagmax_entry = Spinbox(frame1, textvariable=btagmax_val, from_=0, to=9, width=4) #Entry for maximum number of b-tagged jets
+labelminbjet= Label(frame1, text="Minimum:")
+labelmaxbjet= Label(frame1, text="Maximum:") #Labels for b-jets entries
 
 def Nbtagjet(): #function that will show the entry when checkbox clicked
-	if st_btagjetcb.get() ==1:
-		btag_entry.grid(row=11, column=1)
-	else:
-		btag_entry.grid_forget()
-		btag_val.set(0)
+    if st_btagjetcb.get() ==1:
+	labelminbjet.grid(row=12, column=0)
+	labelmaxbjet.grid(row=13, column=0)
+	btagmin_entry.grid(row=12, column=1)
+	btagmax_entry.grid(row=13, column=1)
+    else:
+	btagmin_entry.grid_forget()
+	btagmax_entry.grid_forget()
+	labelminbjet.grid_forget()
+	labelmaxbjet.grid_forget()
+	btagmin_val.set(0)
+	btagmax_val.set(9)
 
 st_btagjetcb = IntVar()
 btaggedyes = Checkbutton(frame1, text="Any b-tagged jets?", bg="LightCyan2",
@@ -276,8 +292,12 @@ def chooseNjet(): #Function for checkbox
         maxjet_entry.grid_forget()
         btaggedyes.grid_forget()
         st_btagjetcb.set(0)
-        btag_val.set(0)
-        btag_entry.grid_forget()
+	btagmin_entry.grid_forget()
+	btagmax_entry.grid_forget()
+	labelminbjet.grid_forget()
+	labelmaxbjet.grid_forget()
+	btagmin_val.set(0)
+	btagmax_val.set(9)
 
 jyes = Checkbutton(frame1, text="Choose number jets", bg="LightCyan2", font=("Calibri",10),
 	 variable = st_jetcb, onvalue=1,offvalue=0, command=chooseNjet)
@@ -287,6 +307,8 @@ jyes.grid(row=8,column=0, sticky=W) #Define and show checkbox
 frame1.grid_rowconfigure(9, minsize=30, weight=1)
 frame1.grid_rowconfigure(10, minsize=30, weight=1)
 frame1.grid_rowconfigure(11, minsize=30, weight=1)
+frame1.grid_rowconfigure(12, minsize=30, weight=1)
+frame1.grid_rowconfigure(13, minsize=30, weight=1)
 
 
 
@@ -304,8 +326,8 @@ st_missPcb= IntVar() #Checkbutton state
 def choosemissP():  #Function for checkbutton
     if st_missPcb.get()==1:
 
-        slider_minmissP.grid(row=13, column=0) #If state 1, show slider
-	slider_maxmissP.grid(row=14, column=0)
+        slider_minmissP.grid(row=15, column=0) #If state 1, show slider
+	slider_maxmissP.grid(row=16, column=0)
     else:
         slider_minmissP.grid_forget()
         minmissE_val.set(0)
@@ -315,15 +337,15 @@ def choosemissP():  #Function for checkbutton
 minmissPyes = Checkbutton(frame1, text="Missing\n transverse momentum (GeV)", font=("Calibri",10), bg="LightCyan2", 
 	variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
 
-minmissPyes.grid(row=12,column=0, sticky=W) #Define and show checkbutton0
-frame1.grid_rowconfigure(13, minsize=60, weight=1)
-frame1.grid_rowconfigure(14, minsize=60, weight=1)
+minmissPyes.grid(row=14,column=0, sticky=W) #Define and show checkbutton0
+frame1.grid_rowconfigure(15, minsize=60, weight=1)
+frame1.grid_rowconfigure(16, minsize=60, weight=1)
 
 #Percentage of data to analize
 percentg_val = DoubleVar()
 percentg_val.set(0)
 PercentgEntry = Scale(frame1, label="Percentage of data to analize:", bg="LightCyan2",from_=0, to=100, orient=HORIZONTAL, length=300, resolution=0.5,variable = percentg_val)
-PercentgEntry.grid(row=15, column=0, columnspan=2, sticky=W)
+PercentgEntry.grid(row=17, column=0, columnspan=2, sticky=W)
 
 #Button to open root browser
 
@@ -369,24 +391,39 @@ submenu.add_command(label="Root Browser", command=browser)
 
 ## Fuction for analysis
 
+
+#Button to start analysis
+run = Button(frame1, text="RUN", font=("Calibri",12) ,bg="Green", 
+             activebackground="Black", fg= "White", activeforeground="White")
+
+run.grid(row=20, column=0)
+
+frame1.grid_rowconfigure(19, minsize=30, weight=1)
+
+test = Button(frame1, text="TEST", font=("Calibri",12) ,bg="White", 
+             activebackground="Black", fg= "Black", activeforeground="White")
+
+#Abort button (doesn't do anything at the moment)
+abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red", 
+             activebackground="Black", fg= "White", activeforeground="White")
+
 histograms =[]
 
 def run_analysis():
-    """runs the analysis"""
-    
+    """runs the analysis"""  
+
     global latestThread
     if latestThread!= None:
         latestThread.shutdown()
         latestThread=None
-        
+   
     selection = []
     global histograms
     
     del histograms[:]
     
-    CustomConfiguration.Job["Fraction"] = percentg_val.get()/100.0
+    CustomConfiguration.Job["Fraction"] = percentg_val.get()/100.0   
 
-    
     histograms.append("n_jets")
     histograms.append("lep_n")
     
@@ -524,9 +561,44 @@ def run_analysis():
     if st_missPcb.get()==1: #missing momentum
         missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),maxmissE_val.get())
         selection.append(missE_chk)
-     
+        
     NewRunScript.run(selection,histograms)
-    ROOT.gApplication.Terminate(0) 
+    ROOT.gApplication.Terminate(0)
+    abortb.grid_forget()
+    plot.grid(row=20, sticky=E) 
+
+class run_thread(threading.Thread):
+    """thread for opening a TBrowser"""
+    
+    def __init__(self):
+        self.exit = threading.Event()
+        threading.Thread.__init__(self)
+     
+    def run(self):
+        global b
+        b=run_analysis()
+        while not self.exit.is_set():
+            continue
+        
+    def shutdown(self):
+        self.exit.set()
+
+def run_a():
+    """creates new browser_thread closing
+    the previous one"""  
+    abortb.grid(row=20)
+    plot.grid_forget()  
+    
+    global b
+    global latestThread
+    if latestThread!= None:
+        latestThread.shutdown()
+       # b.Destructor()  
+    latestThread =run_thread()
+    latestThread.setDaemon(True)
+    latestThread.start()
+
+run.config(command = run_a)
  
 def plotting():
     global listphotos
@@ -583,26 +655,11 @@ listcommands = []
 listbuttons = []
 listlabels = []
     
-plot = Button(frame1, text="Plot Results", font=("Calibri", 12) ,bg="Blue", 
+plot = Button(frame1, text="PLOT", font=("Calibri", 11) ,bg="Blue", 
              activebackground="Black", fg= "White",activeforeground="White", command=plotting)
 
-plot.grid(row=20, column=1, sticky=W)
+plot.grid(row=20, column=0, sticky=E)
 
-
-
-#Button to start analysis
-run = Button(frame1, text="Run Analysis", font=("Calibri",14) ,bg="Green", 
-             activebackground="Black", fg= "White", activeforeground="White", command = run_analysis)
-
-run.grid(row=20, column=0, sticky=E)
-
-frame1.grid_rowconfigure(19, minsize=30, weight=1)
-
-#Abort button (doesn't do anything at the moment)
-abort = Button(frame1, text="Abort Analysis", font=("Calibri",12), bg="Red", 
-             activebackground="Black", fg= "White", activeforeground="White")
-
-abort.grid(row=21, column=0, sticky=E)
 
 
 
