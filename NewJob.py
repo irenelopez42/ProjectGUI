@@ -67,7 +67,7 @@ class NewJob(object):
       self.finalize()
       
     def initialize(self):
-      if doNotStop:
+      if NewJob.doNotStop:
           self.OutputFile = ROOT.TFile.Open(self.OutputFileLocation + ".root","RECREATE")
           self.InputTree = self.setupTree()
           self.Analysis  = self.createAnalysis(self.Configuration["Analysis"])
