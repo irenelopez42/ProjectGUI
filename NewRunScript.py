@@ -7,9 +7,15 @@ Created on Thu Feb  9 21:19:29 2017
 import sys
 import os
 import importlib
-import NewJob 
+import NewJob
 import CustomConfiguration
 from multiprocessing import Pool 
+import pathos.multiprocessing as mp
+
+import stopping as st
+
+
+    
 
 def buildProcessingDict(configuration, samples):
     if samples == "": 
@@ -47,10 +53,19 @@ def RunJob(job):
 
  
 #======================================================================
-def run(listChecker,histograms):
-    """
-    Main function to be executed when starting the code.
-    """
+
+class Analyser(object):
+    def __init__(self):
+        super(Analyser,self).__init__()
+        self.jobs = None
+                
+    def end(self):
+        NewJob.doNotStop= False
+        
+    def run(self,listChecker,histograms):
+         """
+         Main function to be executed when starting the code.
+         """
     # global configuration
    # parser = argparse.ArgumentParser( description = 'Analysis Tool using XMLs' )
    # parser.add_argument('-n', '--nWorkers',   default=4,                                 type=int,   help='number of workers' )  
@@ -65,16 +80,18 @@ def run(listChecker,histograms):
     #configuration = importlib.import_module(configModuleName)
   
     #checkAnalysis(configuration, args.analysis)
-    processingDict = CustomConfiguration.Processes
+         processingDict = CustomConfiguration.Processes
+         print CustomConfiguration.Job["Fraction"]
 
-    if (False):
-        configuration.Job["Batch"] = True
-        jobs = [BuildJob(CustomConfiguration.Job, processName, fileLocation) for processName, fileLocation in processingDict.items()]
-        jobs = SortJobsBySize(jobs)
-        pool = Pool(processes=args.nWorkers)              # start with n worker processes
-        pool.map(RunJob, jobs, chunksize=1)
+        
+         CustomConfiguration.Job["Batch"] = True
+         jobs = [BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms) for processName, fileLocation in processingDict.items()]
+         jobs = SortJobsBySize(jobs)
+         pool = mp.ProcessingPool(4)              # start with n worker processes
+         pool.map(RunJob, jobs)
 
-    else:
-        for processName, fileLocation in processingDict.items():
-            RunJob(BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms)) 
-  
+    #else:
+        #for processName, fileLocation in processingDict.items():
+         #   RunJob(BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms)) 
+
+

@@ -1,6 +1,7 @@
 import ROOT
 import time
 import Analysis.StandardHistograms as SH
+import NewStandardHistograms as NSH
 
 #======================================================================
 
@@ -45,7 +46,7 @@ class HistManager(object):
         
 
 def returnHistogram(histName):
-	return SH.getStandardHistogram(histName)
+	return NSH.getStandardHistogram(histName)
 
 def writeHist(histObjDic):
 	for  hist in histObjDic.values():

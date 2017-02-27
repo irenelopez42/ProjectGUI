@@ -15,6 +15,7 @@ import NewAnalysisHelpers as AH
 import glob
 import os
 import CustomConfiguration
+import NewJob
 
 window = Tk()
 
@@ -348,8 +349,8 @@ PercentgEntry = Scale(frame1, label="Percentage of data to analize:", bg="LightC
 PercentgEntry.grid(row=17, column=0, columnspan=2, sticky=W)
 
 #Button to open root browser
-
-latestThread=None # last opened thread
+latestThread = None
+analysisThread=None # last opened thread
 b= None
 
 class browser_thread(threading.Thread):
@@ -368,6 +369,25 @@ class browser_thread(threading.Thread):
     def shutdown(self):
         self.exit.set()
 
+class analysis_thread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+    
+    def run(self):
+        run_analysis()
+        
+def abort():
+    global analysis
+    analysis.end()
+        
+        
+def create_analysis():
+    
+    
+    global analysisThread
+    analysisThread =  analysis_thread()
+    analysisThread.setDaemon(True)
+    analysisThread.start()
 
 def browser():
     """creates new browser_thread closing
@@ -384,12 +404,15 @@ def browser():
 
 
 #rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
+
 #             activebackground="Black", fg= "White",activeforeground="White", command=browser)
 #rbrowser.grid(row=19)
 submenu.add_command(label="Root Browser", command=browser)
 
 
 ## Fuction for analysis
+
+analysis = None
 
 
 #Button to start analysis
@@ -491,9 +514,17 @@ def run_analysis():
                else:
                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
                selection.append(twoLepFlavour)
+
+               
+           if st_InvMasscb.get()==1:
+               invMassCheck = CheckFileSuper.CheckInvMass(InvariantM_val.get(),Range_val.get(),0,1,"invMass")
+               selection.append(invMassCheck)
+               histograms.append("invMass")
+               
+                
             
         if nlep_val.get()==3:
-        
+
             subselection =[]
         
             if st_lepchargecb.get()!=0: #lepton charge
@@ -511,7 +542,7 @@ def run_analysis():
                     twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
                
                 subselection.append(twoLepFlavour)
-                
+
             threeLepton = CheckFileSuper.CheckThreeLepton("invMass",InvariantM_val.get(),Range_val.get(),
                                                LepTmass_val.get(),"WtMass", subselection)                                               
             selection.append(threeLepton)
@@ -544,7 +575,7 @@ def run_analysis():
                                                        InvariantM_val.get(),InvariantM2_val.get(),Range_val.get(),subselection)
 
             selection.append(fourLepton)
-            
+
             histograms.append("invMass")
             histograms.append("invMass2")
             
@@ -560,12 +591,14 @@ def run_analysis():
     
     if st_missPcb.get()==1: #missing momentum
         missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),maxmissE_val.get())
-        selection.append(missE_chk)
-        
+
+        selection.append(missE_chk)     
+    
     NewRunScript.run(selection,histograms)
-    ROOT.gApplication.Terminate(0)
+            
     abortb.grid_forget()
-    plotbut.grid(row=20, sticky=E) 
+    plotb.grid(row=20, sticky=E) 
+    run.config(command = run_a)
     global listphotos
     del listphotos[:]
     global listphotosbig
@@ -585,7 +618,7 @@ def run_analysis():
 
     if not histograms == []:
         NewPlotResults.plot_results(histograms)
-
+    
 class run_thread(threading.Thread):
     """thread for opening a TBrowser"""
     
@@ -606,7 +639,7 @@ def run_a():
     """creates new browser_thread closing
     the previous one"""  
     abortb.grid(row=20)
-    plotbut.grid_forget()  
+    plotb.grid_forget()  
     
     global b
     global latestThread
@@ -617,7 +650,9 @@ def run_a():
     latestThread.setDaemon(True)
     latestThread.start()
 
+
 run.config(command = run_a)
+
  
 def plotting():
     
@@ -653,11 +688,12 @@ listphotosbig = []
 listcommands = []
 listbuttons = []
 listlabels = []
-    
-plotbut = Button(frame1, text="PLOT", font=("Calibri", 11) ,bg="Blue", 
+
+plotb = Button(frame1, text="PLOT", font=("Calibri", 11) ,bg="Blue", 
              activebackground="Black", fg= "White",activeforeground="White", command=plotting)
 
-plotbut.grid(row=20, column=0, sticky=E)
+ 
+plotb.grid(row=20, column=0, sticky=E)
 
 
 
