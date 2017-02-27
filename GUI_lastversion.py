@@ -15,6 +15,8 @@ import NewAnalysisHelpers as AH
 import glob
 import os
 import CustomConfiguration
+import NewJob
+import stopping as st
 
 window = Tk()
 
@@ -326,8 +328,8 @@ PercentgEntry = Scale(frame1, label="Percentage of data to analize:", bg="LightC
 PercentgEntry.grid(row=15, column=0, columnspan=2, sticky=W)
 
 #Button to open root browser
-
-latestThread=None # last opened thread
+latestThread = None
+analysisThread=None # last opened thread
 b= None
 
 class browser_thread(threading.Thread):
@@ -346,6 +348,26 @@ class browser_thread(threading.Thread):
     def shutdown(self):
         self.exit.set()
 
+class analysis_thread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+    
+    def run(self):
+        run_analysis()
+        
+def abort():
+    global analysis
+    analysis.end()
+        
+        
+def create_analysis():
+    
+    st.doNotStop = True
+    
+    global analysisThread
+    analysisThread =  analysis_thread()
+    analysisThread.setDaemon(True)
+    analysisThread.start()
 
 def browser():
     """creates new browser_thread closing
@@ -361,13 +383,15 @@ def browser():
     latestThread.start()
 
 
-#rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
+#rbrowser = Button(frame1, text="Root Browser", font=("Calibri",0) ,bg="Blue", 
 #             activebackground="Black", fg= "White",activeforeground="White", command=browser)
 #rbrowser.grid(row=19)
 submenu.add_command(label="Root Browser", command=browser)
 
 
 ## Fuction for analysis
+
+analysis = None
 
 histograms =[]
 
@@ -454,6 +478,13 @@ def run_analysis():
                else:
                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
                selection.append(twoLepFlavour)
+               
+           if st_InvMasscb.get()==1:
+               invMassCheck = CheckFileSuper.CheckInvMass(InvariantM_val.get(),Range_val.get(),0,1,"invMass")
+               selection.append(invMassCheck)
+               histograms.append("invMass")
+               
+                
             
         if nlep_val.get()==3:
         
@@ -525,8 +556,15 @@ def run_analysis():
         missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),maxmissE_val.get())
         selection.append(missE_chk)
      
-    NewRunScript.run(selection,histograms)
-    ROOT.gApplication.Terminate(0) 
+    global analysis
+    
+    analysis = NewRunScript.Analyser()
+    analysis.run(selection,histograms)
+    print "finished"
+    
+    
+    
+    
  
 def plotting():
     global listphotos
@@ -592,7 +630,7 @@ plot.grid(row=20, column=1, sticky=W)
 
 #Button to start analysis
 run = Button(frame1, text="Run Analysis", font=("Calibri",14) ,bg="Green", 
-             activebackground="Black", fg= "White", activeforeground="White", command = run_analysis)
+             activebackground="Black", fg= "White", activeforeground="White", command = create_analysis)
 
 run.grid(row=20, column=0, sticky=E)
 
@@ -600,7 +638,7 @@ frame1.grid_rowconfigure(19, minsize=30, weight=1)
 
 #Abort button (doesn't do anything at the moment)
 abort = Button(frame1, text="Abort Analysis", font=("Calibri",12), bg="Red", 
-             activebackground="Black", fg= "White", activeforeground="White")
+             activebackground="Black", fg= "White", activeforeground="White",command = abort)
 
 abort.grid(row=21, column=0, sticky=E)
 

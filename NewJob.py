@@ -7,12 +7,21 @@ import CustomAnalysis
 
 import Analysis.JobStatistics
 
+import stopping as st
+
 #======================================================================
+
+
+
+
 
 class NewJob(object):
     """This class is a carrier class for a given analysis. It takes care of the technical details like
     file writing, setting up the input tree and providing statistics about the status of the analysis.    
     """
+
+    doNotStop = True
+    
     def __init__(self, processName, configuration, inputLocation,list_check,histograms):
         super(NewJob, self).__init__()
         #Configurables
@@ -20,8 +29,10 @@ class NewJob(object):
         self.Configuration = configuration
         self.MaxEvents     = configuration["MaxEvents"]
         self.InputFiles    = glob.glob(inputLocation)
-	self.list_check = list_check
-	self.histograms = histograms
+        self.list_check = list_check
+        self.histograms = histograms
+        
+        
 
         # Outputs
         self.OutputFileLocation = configuration["OutputDirectory"] + processName
@@ -56,20 +67,27 @@ class NewJob(object):
       self.finalize()
       
     def initialize(self):
-      self.OutputFile = ROOT.TFile.Open(self.OutputFileLocation + ".root","RECREATE")
-      self.InputTree = self.setupTree()
-      self.Analysis  = self.createAnalysis(self.Configuration["Analysis"])
-      self.determineMaxEvents()
-      self.Analysis.doInitialization()
+      if doNotStop:
+          self.OutputFile = ROOT.TFile.Open(self.OutputFileLocation + ".root","RECREATE")
+          self.InputTree = self.setupTree()
+          self.Analysis  = self.createAnalysis(self.Configuration["Analysis"])
+          self.determineMaxEvents()
+          self.Analysis.doInitialization()
         
     def execute(self):
-      for n in xrange(self.MaxEvents):
+      n=0
+      while NewJob.doNotStop and n < self.MaxEvents:
         self.InputTree.GetEntry(n)
         self.Analysis.doAnalysis()
+        n = n+1
             
     def finalize(self):
-      self.Analysis.doFinalization()
-      self.OutputFile.Close()
+      if NewJob.doNotStop:
+          self.Analysis.doFinalization()
+      if self.OutputFile!= None:
+          self.OutputFile.Close()
+    
+      print NewJob.doNotStop
 
 
     # Helper functions
