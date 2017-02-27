@@ -16,7 +16,6 @@ import glob
 import os
 import CustomConfiguration
 import NewJob
-import stopping as st
 
 window = Tk()
 
@@ -384,7 +383,6 @@ def abort():
         
 def create_analysis():
     
-    st.doNotStop = True
     
     global analysisThread
     analysisThread =  analysis_thread()
@@ -405,7 +403,8 @@ def browser():
     latestThread.start()
 
 
-#rbrowser = Button(frame1, text="Root Browser", font=("Calibri",0) ,bg="Blue", 
+#rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
+
 #             activebackground="Black", fg= "White",activeforeground="White", command=browser)
 #rbrowser.grid(row=19)
 submenu.add_command(label="Root Browser", command=browser)
@@ -414,6 +413,7 @@ submenu.add_command(label="Root Browser", command=browser)
 ## Fuction for analysis
 
 analysis = None
+
 
 #Button to start analysis
 run = Button(frame1, text="RUN", font=("Calibri",12) ,bg="Green", 
@@ -514,6 +514,7 @@ def run_analysis():
                else:
                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
                selection.append(twoLepFlavour)
+
                
            if st_InvMasscb.get()==1:
                invMassCheck = CheckFileSuper.CheckInvMass(InvariantM_val.get(),Range_val.get(),0,1,"invMass")
@@ -523,7 +524,7 @@ def run_analysis():
                 
             
         if nlep_val.get()==3:
-        
+
             subselection =[]
         
             if st_lepchargecb.get()!=0: #lepton charge
@@ -541,7 +542,7 @@ def run_analysis():
                     twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
                
                 subselection.append(twoLepFlavour)
-                
+
             threeLepton = CheckFileSuper.CheckThreeLepton("invMass",InvariantM_val.get(),Range_val.get(),
                                                LepTmass_val.get(),"WtMass", subselection)                                               
             selection.append(threeLepton)
@@ -574,7 +575,7 @@ def run_analysis():
                                                        InvariantM_val.get(),InvariantM2_val.get(),Range_val.get(),subselection)
 
             selection.append(fourLepton)
-            
+
             histograms.append("invMass")
             histograms.append("invMass2")
             
@@ -590,14 +591,33 @@ def run_analysis():
     
     if st_missPcb.get()==1: #missing momentum
         missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),maxmissE_val.get())
+
         selection.append(missE_chk)     
     
-    analysis = NewRunScript.Analyser()
-    analysis.run(selection,histograms)
-    print "finished"
+    NewRunScript.run(selection,histograms)
             
     abortb.grid_forget()
-    plot.grid(row=20, sticky=E) 
+    plotb.grid(row=20, sticky=E) 
+    run.config(command = run_a)
+    global listphotos
+    del listphotos[:]
+    global listphotosbig
+    del listphotosbig[:]
+    global listcommands
+    del listcommands[:]
+    global listbuttons
+    if len(listbuttons) > 0:
+        for i in range(0,len(listbuttons)):
+            listbuttons[i].grid_forget()
+    del listbuttons[:]
+    global listlabels
+    del listlabels[:]
+    previousplots=glob.glob('Output/*.png')
+    for plot in previousplots: 
+        os.remove(plot)
+
+    if not histograms == []:
+        NewPlotResults.plot_results(histograms)
     
 class run_thread(threading.Thread):
     """thread for opening a TBrowser"""
@@ -619,7 +639,7 @@ def run_a():
     """creates new browser_thread closing
     the previous one"""  
     abortb.grid(row=20)
-    plot.grid_forget()  
+    plotb.grid_forget()  
     
     global b
     global latestThread
@@ -630,29 +650,11 @@ def run_a():
     latestThread.setDaemon(True)
     latestThread.start()
 
+
 run.config(command = run_a)
+
  
 def plotting():
-    global listphotos
-    del listphotos[:]
-    global listphotosbig
-    del listphotosbig[:]
-    global listcommands
-    del listcommands[:]
-    global listbuttons
-    if len(listbuttons) > 0:
-        for i in range(0,len(listbuttons)):
-            listbuttons[i].grid_forget()
-    del listbuttons[:]
-    global listlabels
-    del listlabels[:]
-    previousplots=glob.glob('Output/*.png')
-    for plot in previousplots: 
-        os.remove(plot)
-     
-    global histograms
-    if not histograms == []:
-        NewPlotResults.plot_results(histograms)
     
     plots = glob.glob('Output/*.png')
     lplots = len(plots)
@@ -686,27 +688,12 @@ listphotosbig = []
 listcommands = []
 listbuttons = []
 listlabels = []
-    
-plot = Button(frame1, text="PLOT", font=("Calibri", 11) ,bg="Blue", 
+
+plotb = Button(frame1, text="PLOT", font=("Calibri", 11) ,bg="Blue", 
              activebackground="Black", fg= "White",activeforeground="White", command=plotting)
 
  
-plot.grid(row=20, column=1, sticky=W)
-
-
-
-#Button to start analysis
-run = Button(frame1, text="Run Analysis", font=("Calibri",14) ,bg="Green", 
-             activebackground="Black", fg= "White", activeforeground="White", command = create_analysis)
-
-#run.grid(row=20, column=0, sticky=E)
-
-frame1.grid_rowconfigure(19, minsize=30, weight=1)
-
-#Abort button (doesn't do anything at the moment)
-abort = Button(frame1, text="Abort Analysis", font=("Calibri",12), bg="Red", 
-             activebackground="Black", fg= "White", activeforeground="White",command = abort)
-plot.grid(row=20, column=0, sticky=E)
+plotb.grid(row=20, column=0, sticky=E)
 
 
 
