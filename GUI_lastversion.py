@@ -16,6 +16,7 @@ import glob
 import os
 import CustomConfiguration
 import NewJob
+import stopping
 
 window = Tk()
 
@@ -368,6 +369,10 @@ class browser_thread(threading.Thread):
         
     def shutdown(self):
         self.exit.set()
+        
+    def stop(self):
+        NewJob.doNotStop = False
+        print NewJob.doNotStop 
 
 class analysis_thread(threading.Thread):
     def __init__(self):
@@ -377,12 +382,15 @@ class analysis_thread(threading.Thread):
         run_analysis()
         
     def stop(self):
-        NewJob.doNotStop = False
+        NewJob.NewJob.doNotStop = False
+        print NewJob.NewJob.doNotStop, "he"
         
 def abort():
-    global analysisThread
-    analysisThread.stop()
-        
+    global analyser
+    print analyser.stopping.doNotStop    
+    analyser.stopping.doNotStop = False
+
+    
         
 def create_analysis():
     
@@ -431,18 +439,17 @@ test = Button(frame1, text="TEST", font=("Calibri",12) ,bg="White",
 
 #Abort button (doesn't do anything at the moment)
 abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red", 
-             activebackground="Black", fg= "White", activeforeground="White",command = abort)
+             activebackground="Black", fg= "White", activeforeground="White",command = abort
+             )
 
 histograms =[]
+
+analyser = None
 
 def run_analysis():
     """runs the analysis"""  
 
-    global latestThread
-    if latestThread!= None:
-        latestThread.shutdown()
-        latestThread=None
-   
+    
     selection = []
     global histograms
     
@@ -595,9 +602,12 @@ def run_analysis():
     if st_missPcb.get()==1: #missing momentum
         missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),maxmissE_val.get())
 
-        selection.append(missE_chk)     
+        selection.append(missE_chk) 
+     
+    global analyser 
+    analyser = NewRunScript.Analyser()
     
-    NewRunScript.run(selection,histograms)
+    analyser.run(selection,histograms)
             
     abortb.grid_forget()
     plotb.grid(row=20, sticky=E) 
@@ -626,17 +636,14 @@ class run_thread(threading.Thread):
     """thread for opening a TBrowser"""
     
     def __init__(self):
-        self.exit = threading.Event()
         threading.Thread.__init__(self)
-     
-    def run(self):
-        global b
-        b=run_analysis()
-        while not self.exit.is_set():
-            continue
         
-    def shutdown(self):
-        self.exit.set()
+    def run(self):
+        run_analysis()
+    
+    def stop(self):
+        global stopper
+        stopper.stop()
 
 def run_a():
     """creates new browser_thread closing
@@ -644,11 +651,7 @@ def run_a():
     abortb.grid(row=20)
     plotb.grid_forget()  
     
-    global b
     global latestThread
-    if latestThread!= None:
-        latestThread.shutdown()
-       # b.Destructor()  
     latestThread =run_thread()
     latestThread.setDaemon(True)
     latestThread.start()

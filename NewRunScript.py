@@ -38,8 +38,8 @@ def checkAnalysis(configuration, analysisOption):
         print "Error when trying to read the analysis code for %s. Please check name validity" % analysisName
         sys.exit(1)
 
-def BuildJob(configuration, processName, fileLocation,list_check,histograms):
-    job = NewJob.NewJob(processName, configuration, fileLocation,list_check,histograms)
+def BuildJob(configuration, processName, fileLocation,list_check,histograms,stopping):
+    job = NewJob.NewJob(processName, configuration, fileLocation,list_check,histograms,stopping)
     return job
 
 
@@ -58,10 +58,8 @@ class Analyser(object):
     def __init__(self):
         super(Analyser,self).__init__()
         self.jobs = None
-                
-    def end(self):
-        NewJob.doNotStop= False
-        
+        self.stopping = st.stopping()
+
     def run(self,listChecker,histograms):
          """
          Main function to be executed when starting the code.
@@ -85,7 +83,7 @@ class Analyser(object):
 
         
          CustomConfiguration.Job["Batch"] = True
-         jobs = [BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms) for processName, fileLocation in processingDict.items()]
+         jobs = [BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms,self.stopping) for processName, fileLocation in processingDict.items()]
          jobs = SortJobsBySize(jobs)
          pool = mp.ProcessingPool(4)              # start with n worker processes
          pool.map(RunJob, jobs)

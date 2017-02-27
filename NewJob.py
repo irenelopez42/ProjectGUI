@@ -7,9 +7,8 @@ import CustomAnalysis
 
 import Analysis.JobStatistics
 
-import stopping as st
 
-#======================================================================
+#==================================================================
 
 
 
@@ -20,11 +19,8 @@ class NewJob(object):
     file writing, setting up the input tree and providing statistics about the status of the analysis.    
     """
 
-    doNotStop = True
     
-    
-    
-    def __init__(self, processName, configuration, inputLocation,list_check,histograms):
+    def __init__(self, processName, configuration, inputLocation,list_check,histograms,stopping):
         super(NewJob, self).__init__()
         #Configurables
         self.Name       = processName
@@ -33,9 +29,8 @@ class NewJob(object):
         self.InputFiles    = glob.glob(inputLocation)
         self.list_check = list_check
         self.histograms = histograms
+        self.st = stopping
         
-        
-
         # Outputs
         self.OutputFileLocation = configuration["OutputDirectory"] + processName
         self.OutputFile = None
@@ -69,7 +64,7 @@ class NewJob(object):
       self.finalize()
       
     def initialize(self):
-      if NewJob.doNotStop:
+      if self.st.doNotStop:
           self.OutputFile = ROOT.TFile.Open(self.OutputFileLocation + ".root","RECREATE")
           self.InputTree = self.setupTree()
           self.Analysis  = self.createAnalysis(self.Configuration["Analysis"])
@@ -78,18 +73,18 @@ class NewJob(object):
         
     def execute(self):
       n=0
-      while NewJob.doNotStop and n < self.MaxEvents:
+      while self.st.doNotStop and n < self.MaxEvents:
         self.InputTree.GetEntry(n)
         self.Analysis.doAnalysis()
         n = n+1
             
     def finalize(self):
-      if NewJob.doNotStop:
+      if self.st.doNotStop:
           self.Analysis.doFinalization()
       if self.OutputFile!= None:
           self.OutputFile.Close()
     
-      print NewJob.doNotStop
+      print self.st.doNotStop
 
 
     # Helper functions
