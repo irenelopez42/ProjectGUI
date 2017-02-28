@@ -72,12 +72,13 @@ class NewJob(object):
           self.Analysis.doInitialization()
         
     def execute(self):
+      
       n=0
       while self.st and n < self.MaxEvents:
         self.InputTree.GetEntry(n)
         self.Analysis.doAnalysis()
         n = n+1
-            
+        
     def finalize(self):
       if self.st:
           self.Analysis.doFinalization()

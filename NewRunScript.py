@@ -87,6 +87,8 @@ class Analyser(object):
          self.jobs = SortJobsBySize(self.jobs)
          pool = mp.ProcessingPool(4)              # start with n worker processes
          pool.map(RunJob, self.jobs)
+         for job in self.jobs:
+             print job.st
 
     #else:
         #for processName, fileLocation in processingDict.items():

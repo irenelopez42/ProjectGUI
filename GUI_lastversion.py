@@ -392,7 +392,11 @@ class analysis_thread(threading.Thread):
         self.exit.set()
         
 def abort():
-    latestThread.shutdown()
+    global analyser
+    analyser.stopping= False
+    for job in analyser.jobs:
+        job.st = False
+        print job.st
         
 def create_analysis():
     
