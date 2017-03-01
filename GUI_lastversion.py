@@ -18,7 +18,6 @@ import CustomConfiguration
 import NewJob
 import stopping
 import ttk
-import time
 import pathos.multiprocessing as mp
 import multiprocessing
 
@@ -404,14 +403,6 @@ def abort():
         process.terminate()
         process.join()
     
-    
-def create_analysis():
-    
-
-    global analysisThread
-    analysisThread =  analysis_thread()
-    analysisThread.setDaemon(True)
-    analysisThread.start()
 
 def browser():
     """creates new browser_thread closing
@@ -665,6 +656,9 @@ def run_analysis():
     #pool.map(NewRunScript.RunJob,jobs)
     
     progressbar.grid_forget()
+    global k
+    k = 0
+    progress_var.set(0)
     abortb.grid_forget()
     if not makeplots:
         plotb.grid(row=20, sticky=E) 
