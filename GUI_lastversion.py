@@ -664,7 +664,9 @@ def run_analysis():
     #pool = mp.ProcessingPool(4)
              # start with n worker processes
     #pool.map(NewRunScript.RunJob,jobs)
-        
+    
+    global runpressed
+    runpressed = False
     progressbar.grid_forget()
     abortb.grid_forget()
     global makeplots
