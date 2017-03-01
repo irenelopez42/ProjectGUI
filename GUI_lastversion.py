@@ -376,21 +376,6 @@ class browser_thread(threading.Thread):
     def stop(self):
         NewJob.doNotStop = False
         print NewJob.doNotStop 
-
-class analysis_thread(threading.Thread):
-    def __init__(self):
-        self.exit = threading.Event()
-        threading.Thread.__init__(self)
-    
-    def run(self):
-        run_analysis()
-        
-    def stop(self):
-        NewJob.NewJob.doNotStop = False
-        print NewJob.NewJob.doNotStop, "he"
-    
-    def shutdown(self):
-        self.exit.set()
         
 def abort():
 
