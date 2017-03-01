@@ -48,6 +48,7 @@ def SortJobsBySize(jobs):
     def jobSize(job):
         return sum([os.lstat(f).st_size for f in job.InputFiles])
     return sorted(jobs, key=jobSize, reverse=True)
+    
 
 def RunJob(job):
     job.run()

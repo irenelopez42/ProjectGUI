@@ -645,17 +645,21 @@ def run_analysis():
 
         
     CustomConfiguration.Job["Batch"] = True
-    jobs = [NewJob.NewJob( processName,CustomConfiguration.Job, fileLocation,selection,histograms) for processName, fileLocation in processingDict.items()]
+    print "second test"
+    jobs = [NewJob.NewJob(processName,CustomConfiguration.Job, fileLocation,selection,histograms) for processName, fileLocation in processingDict.items()]
     jobs = NewRunScript.SortJobsBySize(jobs)
     global pool
+    print "test"
     pool = []
     for job in jobs:
         process = JobPool(job)
         process.start()
         pool.append(process)
-        
+                
+    pool.reverse()
     for process in pool:
         process.join()
+        update_bar()
     #pool = mp.ProcessingPool(4)
              # start with n worker processes
     #pool.map(NewRunScript.RunJob,jobs)
@@ -705,6 +709,7 @@ class run_thread(threading.Thread):
         super(run_thread,self).__init__()
 
     def run(self):
+        print "first test"
         run_analysis()
     
     def stop(self):
@@ -730,6 +735,7 @@ def run_a():
 
     global latestThread
     latestThread =run_thread()
+    latestThread.setDaemon(True)
     latestThread.start()
 
 
