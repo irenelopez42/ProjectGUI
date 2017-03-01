@@ -667,7 +667,6 @@ def run_analysis():
         
     progressbar.grid_forget()
     abortb.grid_forget()
-    global makeplots
     if not makeplots:
         plotb.grid(row=20, sticky=E) 
         return
