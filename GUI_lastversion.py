@@ -491,10 +491,10 @@ def run_analysis():
  
         
         if st_btagjetcb.get()==1: #btagging
-            btag_chk = CheckFileSuper.CheckBTag(btag_val.get())
+            btag_chk = CheckFileSuper.CheckBTag(btagmin_val.get(),btagmin_val.get())
             selection.append(btag_chk)
             
-    if nlep_val.get() != 0: #number of leptons
+    if st_lepcb.get() != 0: #number of leptons
     
         lepn_chk = CheckFileSuper.CheckNLep(nlep_val.get())
         selection.append(lepn_chk)

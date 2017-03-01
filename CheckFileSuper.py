@@ -31,14 +31,15 @@ class CheckNJets(CheckFile):
 class CheckBTag(CheckFile):
     """checking the minimum number of B tagged jets"""
     
-    def __init__(self,numBTag):
+    def __init__(self,minBTag,maxBTag):
         super(CheckBTag,self).__init__()
-        self.numBTag = numBTag
+        self.minBTag = minBTag
+        self.maxBTag = maxBTag
 
     def check(self,EventObject,histogramDic):
         goodJets = EventObject["jets"]
         btags = sum([1 for jet in goodJets if jet.mv1() > 0.7892])    
-        if btags<self.numBTag:
+        if btags<self.minBTag or btags > self.maxBTag:
             return False 
         return True
             
