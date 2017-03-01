@@ -443,6 +443,9 @@ def update_bar():
     k += 1
     window.update_idletasks()
 
+#Label for when plots are being drawn
+drawingp = Label(frame1, text="Drawing plots...",fg="black", height=2, font=("Calibri", 12))
+
 
 histograms =[]
 
@@ -647,7 +650,9 @@ def run_analysis():
     k = 0
     progress_var.set(0)
     abortb.grid_forget()
+    drawingp.grid(row=20)
     if not makeplots:
+        drawingp.grid_forget()
         plotb.grid(row=20, sticky=E) 
         return
     
@@ -671,6 +676,7 @@ def run_analysis():
     if not histograms == []:
         NewPlotResults.plot_results(histograms)
 
+    drawingp.grid_forget()
     plotb.grid(row=20, sticky=E) 
     
 class JobPool(multiprocessing.Process):
