@@ -471,13 +471,12 @@ def run_analysis():
     
     if minmissE_val.get()<=maxmissE_val.get() or maxmissE_val.get()!=0:
         histograms.append("etmiss")
-    
-    histograms.append("lep_pt")
-    histograms.append("lep_eta")
-    histograms.append("lep_phi")
-    histograms.append("lep_E")
-    histograms.append("lep_charge")
-    histograms.append("lep_type")
+        
+    if st_lepcb.get() == 0 or nlep_val.get() !=0:
+        histograms.append("lep_pt")
+        histograms.append("lep_eta")
+        histograms.append("lep_phi")
+        histograms.append("lep_E")
 
     if minnjet_val.get()<=maxnjet_val.get() or maxnjet_val.get()!=0:
                
