@@ -190,7 +190,7 @@ b4_lep = Radiobutton(frame1, text="4 Leptons",
                         variable=nlep_val, value=4, command=extLepOpts)
 
 leppt_val = IntVar() #Want to select min lepton momentum?
-leppt_val.set(0)
+leppt_val.set(25)
 
 slider_leppt = Scale(frame1, from_=0, to=100, orient=HORIZONTAL, length=150,variable=leppt_val) #Define slider
 
@@ -200,7 +200,7 @@ def chooseleppt():  #Function for checkbutton
         slider_leppt.grid(row=7) #If state 1, show slider
     else:
         slider_leppt.grid_forget()
-	leppt_val.set(0)
+	leppt_val.set(25)
 	st_lepptcb.set(0)
 
 lepptyes = Checkbutton(frame1, bg="LightCyan2", text="Choose lepton momentum (GeV)\n (default 25)",  
