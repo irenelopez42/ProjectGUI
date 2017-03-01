@@ -500,12 +500,13 @@ def run_analysis():
         lepn_chk = CheckFileSuper.CheckNLep(nlep_val.get())
         selection.append(lepn_chk)
     
-        histograms.append("leadlep_pt")
-        histograms.append("leadlep_eta")
-        histograms.append("leadlep_phi")
-        histograms.append("leadlep_E")
-        histograms.append("leadlep_charge")
-        histograms.append("leadlep_type")  
+        if nlep_val.get()!=0:
+            histograms.append("leadlep_pt")
+            histograms.append("leadlep_eta")
+            histograms.append("leadlep_phi")
+            histograms.append("leadlep_E")
+            histograms.append("leadlep_charge")
+            histograms.append("leadlep_type")  
         
         if nlep_val.get()==1:        
             #Tmass
