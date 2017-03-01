@@ -459,17 +459,18 @@ abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red",
 MAX = 30
 progress_var = DoubleVar()
 progressbar = ttk.Progressbar(frame1, variable=progress_var, maximum=MAX)
+runpressed = False
 
 def loop_function():
-
-    k = 0
-    while k <= MAX:
-    ### this moves the progress bar
-        progress_var.set(k)
-        k += 1
-        time.sleep(0.02)
-        window.update_idletasks()
-    window.after(100, loop_function) 
+    if runpressed:
+        k = 0
+        while k <= MAX:
+   	 ### this moves the progress bar
+            progress_var.set(k)
+            k += 1
+            time.sleep(0.02)
+            window.update_idletasks()
+        window.after(100, loop_function) 
 
 
 histograms =[]
@@ -688,6 +689,7 @@ def run_analysis():
 
     if not histograms == []:
         NewPlotResults.plot_results(histograms)
+
     plotb.grid(row=20, sticky=E) 
     
 class JobPool(multiprocessing.Process):
@@ -729,6 +731,8 @@ def run_a():
     abortb.grid(row=20)
     plotb.grid_forget()  
     progressbar.grid(row=21)
+    global runpressed
+    runpressed = True
     loop_function()    
 
     global latestThread
