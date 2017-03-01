@@ -12,6 +12,7 @@ import CustomConfiguration
 from multiprocessing import Pool 
 import pathos.multiprocessing as mp
 
+import threading 
 import stopping as st
 
 
@@ -51,6 +52,13 @@ def SortJobsBySize(jobs):
 def RunJob(job):
     job.run()
 
+class JobThread(threading.Thread):
+    def __init__(self,job):
+        super(JobThread,self).__init__()
+        self.job = job
+         
+    def run(self):
+        RunJob(self.job)
  
 #======================================================================
 
@@ -59,6 +67,7 @@ class Analyser(object):
         super(Analyser,self).__init__()
         self.jobs = None
         self.stopping = True
+        self.pool = None
 
     def run(self,listChecker,histograms):
          """
@@ -85,11 +94,26 @@ class Analyser(object):
          CustomConfiguration.Job["Batch"] = True
          self.jobs = [BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms,self.stopping) for processName, fileLocation in processingDict.items()]
          self.jobs = SortJobsBySize(self.jobs)
-         pool = mp.ProcessingPool(4)              # start with n worker processes
-         pool.map(RunJob, self.jobs)
+         self.pool = mp.ProcessingPool(4)
+             # start with n worker processes
+         self.pool.map(RunJob, self.jobs)
+         
+         """jobThreads =[]
          for job in self.jobs:
-             print job.st
-
+             jobThread = JobThread(job)
+             jobThreads.append(jobThread)
+             jobThread.start()
+             
+         for jobThread in jobThreads:
+             jobThread.join()
+         """
+        
+             
+        
+         print "test2"
+         print NewJob.stop
+         
+  
     #else:
         #for processName, fileLocation in processingDict.items():
          #   RunJob(BuildJob(CustomConfiguration.Job, processName, fileLocation,listChecker,histograms)) 

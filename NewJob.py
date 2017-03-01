@@ -4,7 +4,7 @@ import importlib
 import sys
 import time
 import CustomAnalysis
-
+import stopping
 import Analysis.JobStatistics
 
 
@@ -12,7 +12,7 @@ import Analysis.JobStatistics
 
 
 
-
+stop = True
 
 class NewJob(object):
     """This class is a carrier class for a given analysis. It takes care of the technical details like
@@ -20,7 +20,7 @@ class NewJob(object):
     """
 
     
-    def __init__(self, processName, configuration, inputLocation,list_check,histograms,stopping):
+    def __init__(self, processName, configuration, inputLocation,list_check,histograms):
         super(NewJob, self).__init__()
         #Configurables
         self.Name       = processName
@@ -29,7 +29,6 @@ class NewJob(object):
         self.InputFiles    = glob.glob(inputLocation)
         self.list_check = list_check
         self.histograms = histograms
-        self.st = stopping
         
         # Outputs
         self.OutputFileLocation = configuration["OutputDirectory"] + processName
@@ -64,7 +63,8 @@ class NewJob(object):
       self.finalize()
       
     def initialize(self):
-      if self.st:
+      global stop
+      if stop:
           self.OutputFile = ROOT.TFile.Open(self.OutputFileLocation + ".root","RECREATE")
           self.InputTree = self.setupTree()
           self.Analysis  = self.createAnalysis(self.Configuration["Analysis"])
@@ -72,20 +72,21 @@ class NewJob(object):
           self.Analysis.doInitialization()
         
     def execute(self):
-      
+      global stop
       n=0
-      while self.st and n < self.MaxEvents:
+      while stop and n < self.MaxEvents:
         self.InputTree.GetEntry(n)
         self.Analysis.doAnalysis()
         n = n+1
         
     def finalize(self):
-      if self.st:
+      global stop
+      if stop:
           self.Analysis.doFinalization()
       if self.OutputFile!= None:
           self.OutputFile.Close()
     
-      print self.st
+      print stop
 
 
     # Helper functions

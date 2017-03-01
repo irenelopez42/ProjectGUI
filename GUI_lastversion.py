@@ -19,6 +19,8 @@ import NewJob
 import stopping
 import ttk
 import time
+import pathos.multiprocessing as mp
+import multiprocessing
 
 window = Tk()
 
@@ -392,12 +394,17 @@ class analysis_thread(threading.Thread):
         self.exit.set()
         
 def abort():
-    global analyser
-    analyser.stopping= False
-    for job in analyser.jobs:
-        job.st = False
-        print job.st
-        
+
+    global makeplots
+    makeplots = False
+    global pool
+    while pool == None:
+        continue
+    for process in pool:
+        process.terminate()
+        process.join()
+    
+    
 def create_analysis():
     
 
@@ -468,6 +475,8 @@ def loop_function():
 histograms =[]
 
 analyser = None
+pool= None
+makeplots = True
 
 def run_analysis():
     """runs the analysis"""  
@@ -627,11 +636,39 @@ def run_analysis():
 
         selection.append(missE_chk) 
      
-    global analyser 
+    """global analyser 
     analyser = NewRunScript.Analyser()
     
     analyser.run(selection,histograms)
-            
+    """
+    
+    processingDict = CustomConfiguration.Processes
+    print CustomConfiguration.Job["Fraction"]
+
+        
+    CustomConfiguration.Job["Batch"] = True
+    jobs = [NewJob.NewJob( processName,CustomConfiguration.Job, fileLocation,selection,histograms) for processName, fileLocation in processingDict.items()]
+    jobs = NewRunScript.SortJobsBySize(jobs)
+    global pool
+    pool = []
+    for job in jobs:
+        process = JobPool(job)
+        process.start()
+        pool.append(process)
+        
+    for process in pool:
+        process.join()
+    #pool = mp.ProcessingPool(4)
+             # start with n worker processes
+    #pool.map(NewRunScript.RunJob,jobs)
+        
+    progressbar.grid_forget()
+    abortb.grid_forget()
+    global makeplots
+    if not makeplots:
+        plotb.grid(row=20, sticky=E) 
+        return
+    
     global listphotos
     del listphotos[:]
     global listphotosbig
@@ -651,27 +688,37 @@ def run_analysis():
 
     if not histograms == []:
         NewPlotResults.plot_results(histograms)
-    progressbar.grid_forget()
-    abortb.grid_forget()
     plotb.grid(row=20, sticky=E) 
+    
+class JobPool(multiprocessing.Process):
+    
+    def __init__(self,job):
+        super(JobPool,self).__init__()
+        self.job = job
+    
+    def run(self):
+        self.job.run()
+        
     
 class run_thread(threading.Thread):
     """thread for opening a TBrowser"""
     
     def __init__(self):
-        self.exit = threading.Event()
-        threading.Thread.__init__(self)
-        
+        super(run_thread,self).__init__()
+
     def run(self):
         run_analysis()
     
     def stop(self):
+        raise Exception
         global stopper
         stopper.stop()
         
+  
 
-    def shutdown(self):
-        self.exit.set()
+
+        
+    
         
     
     
@@ -686,7 +733,6 @@ def run_a():
 
     global latestThread
     latestThread =run_thread()
-    latestThread.setDaemon(True)
     latestThread.start()
 
 
