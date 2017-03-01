@@ -482,6 +482,8 @@ makeplots = True
 def run_analysis():
     """runs the analysis"""  
 
+    global makeplots
+    makeplots = True
     
     selection = []
     global histograms
