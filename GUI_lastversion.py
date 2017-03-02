@@ -7,6 +7,7 @@ Created on Mon Feb  6 14:25:40 2017
 
 import ROOT
 from Tkinter import * 
+import tkMessageBox
 import threading
 import CheckFileSuper
 import NewRunScript
@@ -22,26 +23,32 @@ import pathos.multiprocessing as mp
 import multiprocessing
 
 window = Tk()
+window.wm_title("Event Analyser") #GUI Name
 
 #Define a drop down menu in case we need it
-menu = Menu(window)
-window.config(menu=menu)
-submenu = Menu(menu)
-menu.add_cascade(label="File", menu=submenu)
+#menu = Menu(window)
+#window.config(menu=menu)
+#submenu = Menu(menu)
+#menu.add_cascade(label="More", menu=submenu)
 
 #Canvas and scrollbar
 
 scrollbar = Scrollbar(window)
-scrollbar.pack(side=RIGHT, fill=Y)
-canvas = Canvas(window, width=1300, height=900, yscrollcommand=scrollbar.set, scrollregion=(0,0,0,890))
-canvas.pack()
+canvas = Canvas(window, width=420, height=700, yscrollcommand=scrollbar.set, scrollregion=(0,0,0,890))
+canvas.pack(side=LEFT)
+scrollbar.pack(side=LEFT, fill=Y)
 scrollbar.config(command=canvas.yview)
 
 #Create invisible frames to organize layout
-frame1 = Frame(window, width="200", padx=50) #where widgets will be
+frame1 = Frame(window, width="200", padx=10) #where widgets will be
 canvas.create_window(210,430, window=frame1)
-frameOUT = Frame(window, width="870", height="900", bg="thistle4") #where plots will show
-canvas.create_window(850,410, window=frameOUT)
+frameOUT = Frame(window, width="812", height="700", bg="thistle4") #where plots will show
+frameOUT.pack(side=LEFT, fill=BOTH, expand=1)
+frameOUT.grid_rowconfigure(0, minsize=83, weight=1)
+frameOUT.grid_rowconfigure(6, minsize=83, weight=1)
+frameOUT.grid_columnconfigure(0, minsize=50, weight=1)
+frameOUT.grid_columnconfigure(6, minsize=50, weight=1) #These will make the plots appear centered
+
 
 #Widgets:
     
@@ -407,7 +414,7 @@ def browser():
 
 #             activebackground="Black", fg= "White",activeforeground="White", command=browser)
 #rbrowser.grid(row=19)
-submenu.add_command(label="Root Browser", command=browser)
+#submenu.add_command(label="Root Browser", command=browser)
 
 
 ## Fuction for analysis
@@ -422,6 +429,7 @@ run = Button(frame1, text="RUN", font=("Calibri",12) ,bg="Green",
 run.grid(row=20, column=0)
 
 frame1.grid_rowconfigure(19, minsize=30, weight=1)
+frame1.grid_rowconfigure(21, minsize=30, weight=1)
 
 test = Button(frame1, text="TEST", font=("Calibri",12) ,bg="White", 
              activebackground="Black", fg= "Black", activeforeground="White")
@@ -651,10 +659,12 @@ def run_analysis():
     progress_var.set(0)
     abortb.grid_forget()
     drawingp.grid(row=20)
+    global runpressed
     if not makeplots:
         drawingp.grid_forget()
         plotb.grid(row=20, sticky=E) 
-        run.grid(row=20,sticky=W)
+        run.grid(row=20)
+        runpressed = False
         return
     
     global listphotos
@@ -679,7 +689,8 @@ def run_analysis():
 
     drawingp.grid_forget()
     plotb.grid(row=20, sticky=E) 
-    run.grid(row=20,sticky=W)
+    run.grid(row=20)
+    runpressed = False
     
 class JobPool(multiprocessing.Process):
     
@@ -710,9 +721,8 @@ class run_thread(threading.Thread):
 
 
         
-    
-        
-    
+   
+runpressed = False
     
 
 def run_a():
@@ -722,6 +732,8 @@ def run_a():
     plotb.grid_forget()  
     run.grid_forget()
     progressbar.grid(row=21) 
+    global runpressed
+    runpressed = True
 
     global latestThread
     latestThread =run_thread()
@@ -738,22 +750,22 @@ def plotting():
     lplots = len(plots)
     try:
 	    for j in range(0, 6):
-		    for i in range(0,6):
-			    photo = PhotoImage(file= plots[i+j*6])
-			    listphotosbig.insert(i+j*6, photo)
-			    photo2 = photo.subsample(9)
-			    listphotos.insert(i+j*6, photo2)
+		    for i in range(0,4):
+			    photo = PhotoImage(file= plots[i+j*4])
+			    listphotosbig.insert(i+j*4, photo)
+			    photo2 = photo.subsample(6)
+			    listphotos.insert(i+j*4, photo2)
 			    def showplot(p=i,q=j):
 				    newwin = Toplevel()
 				    topscrollbar = Scrollbar(newwin)
 				    topscrollbar.pack(side=RIGHT, fill=Y)
 				    topcanvas = Canvas(newwin, width=900, height=2000, yscrollcommand=topscrollbar.set, scrollregion=(0,0,0,850))
 				    topcanvas.pack()
-				    bigplot = topcanvas.create_image(450,420, image = listphotosbig[p+q*6])
+				    bigplot = topcanvas.create_image(450,420, image = listphotosbig[p+q*4])
 				    topscrollbar.config(command=topcanvas.yview)
-			    listcommands.insert(i+j*6, showplot)
-			    listbuttons.insert(i+j*6, Button(frameOUT, command=listcommands[i+j*6], compound=BOTTOM, text=plots[i+j*6][7:][:-4], image=listphotos[i+j*6]))
-			    listbuttons[i+j*6].grid(row=j, column=i)
+			    listcommands.insert(i+j*4, showplot)
+			    listbuttons.insert(i+j*4, Button(frameOUT, command=listcommands[i+j*4], compound=BOTTOM, text=plots[i+j*4][7:][:-4], image=listphotos[i+j*4]))
+			    listbuttons[i+j*4].grid(row=j+1, column=i+1)
 
     except IndexError:
 	    pass
@@ -777,8 +789,18 @@ plotb.grid(row=20, column=0, sticky=E)
 
 
 #Add a few functions to menu
-submenu.add_command(label="Run Analysis", command=run_analysis)
-submenu.add_command(label="Plot Results", command=plotting)
+#submenu.add_command(label="Run Analysis", command=run_analysis)
+#submenu.add_command(label="Plot Results", command=plotting)
+
+#When they try to leave analysis aborted
+
+def on_closing():
+    if runpressed:
+	 tkMessageBox.showwarning("WARNING","Analysis still runnin.\n Please, press abort")
+    else:
+         window.destroy()
+
+window.protocol("WM_DELETE_WINDOW", on_closing)
 
 
 window.mainloop()
