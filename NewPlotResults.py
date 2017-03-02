@@ -9,6 +9,7 @@ import Plotting.Depiction as Depiction
 import Plotting.Database  as Database
 import importlib
 import PlotConf_CustomAnalysis
+import ImageNames as imn
 from collections import OrderedDict
  
 def collectPaintables(definition):
@@ -90,7 +91,7 @@ def DrawPlot(configuration, histlocation):
     canvas.legend = drawLegend(Paintables, Depictions[0].PaintingOrder)
     [d.drawDepiction(Paintables) for d in Depictions]
 
-    canvas.SaveAs("Output/" + histlocation+ ".png")  
+    canvas.SaveAs("Output/" + imn.ImageDic[histlocation]+ ".png")  
  
 #======================================================================
 def plot_results(histograms):

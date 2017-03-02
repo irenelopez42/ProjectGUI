@@ -502,13 +502,13 @@ def run_analysis():
         lepn_chk = CheckFileSuper.CheckNLep(nlep_val.get())
         selection.append(lepn_chk)
     
-        if nlep_val.get()!=0:
-            histograms.append("leadlep_pt")
-            histograms.append("leadlep_eta")
-            histograms.append("leadlep_phi")
-            histograms.append("leadlep_E")
-            histograms.append("leadlep_charge")
-            histograms.append("leadlep_type")  
+        #if nlep_val.get()!=0:
+         #   histograms.append("leadlep_pt")
+          #  histograms.append("leadlep_eta")
+           # histograms.append("leadlep_phi")
+            #histograms.append("leadlep_E")
+            #histograms.append("leadlep_charge")
+            #histograms.append("leadlep_type")  
         
         if nlep_val.get()==1:        
             #Tmass
@@ -601,13 +601,13 @@ def run_analysis():
             
         
             
-    if nlep_val.get()>1:
-        histograms.append("traillep_pt")
-        histograms.append("traillep_eta")
-        histograms.append("traillep_E")
-        histograms.append("traillep_phi")
-        histograms.append("traillep_charge")
-        histograms.append("traillep_type")
+    #if nlep_val.get()>1:
+     #   histograms.append("traillep_pt")
+      #  histograms.append("traillep_eta")
+       # histograms.append("traillep_E")
+        #histograms.append("traillep_phi")
+        #histograms.append("traillep_charge")
+        #histograms.append("traillep_type")
     
     if st_missPcb.get()==1: #missing momentum
         missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),maxmissE_val.get())
@@ -633,6 +633,7 @@ def run_analysis():
     pool = []
     for job in jobs:
         process = JobPool(job)
+        process
         process.start()
         pool.append(process)
                 
@@ -653,6 +654,7 @@ def run_analysis():
     if not makeplots:
         drawingp.grid_forget()
         plotb.grid(row=20, sticky=E) 
+        run.grid(row=20,sticky=W)
         return
     
     global listphotos
@@ -677,6 +679,7 @@ def run_analysis():
 
     drawingp.grid_forget()
     plotb.grid(row=20, sticky=E) 
+    run.grid(row=20,sticky=W)
     
 class JobPool(multiprocessing.Process):
     
@@ -717,6 +720,7 @@ def run_a():
     the previous one"""  
     abortb.grid(row=20)
     plotb.grid_forget()  
+    run.grid_forget()
     progressbar.grid(row=21) 
 
     global latestThread
