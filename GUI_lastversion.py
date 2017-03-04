@@ -26,10 +26,10 @@ window = Tk()
 window.wm_title("Event Analyser") #GUI Name
 
 #Define a drop down menu in case we need it
-#menu = Menu(window)
-#window.config(menu=menu)
-#submenu = Menu(menu)
-#menu.add_cascade(label="More", menu=submenu)
+menu = Menu(window)
+window.config(menu=menu)
+submenu = Menu(menu)
+menu.add_cascade(label="More", menu=submenu)
 
 #Canvas and scrollbar
 
@@ -127,7 +127,7 @@ slider_LepTMass = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
 			length=170, width=10, variable = LepTmass_val, bg = "lavender",label="Transverse mass") #slider for transverse mass
 chooseLepchargecb = Checkbutton(OptionsLep, text="Choose leptons' charges", bg ="lavender", variable = st_lepchargecb, onvalue=1,offvalue=0, 				command=chooseLepcharge)
 chooseLepflavourcb = Checkbutton(OptionsLep, text="Choose leptons' flavours", bg = "lavender", variable = st_lepflavourcb, onvalue=1,offvalue=0, command=chooseLepflavour)
-chooseInvMass = Checkbutton(OptionsLep, bg="lavender", text="Choose invariant mass",  
+chooseInvMass = Checkbutton(OptionsLep, bg="lavender", text="Choose invariant \nmass of lepton pair",  
 	variable = st_InvMasscb, onvalue=1,offvalue=0, command=chooseInvMass)
 slider_InvariantM2 = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL,
 			length=170, width=10, variable = InvariantM2_val, bg = "lavender",label="Invariant mass of 2nd pair") #Slider for invariant mass of 2nd pair (4 leptons case)  
@@ -209,7 +209,7 @@ def chooseleppt():  #Function for checkbutton
 	leppt_val.set(25)
 	st_lepptcb.set(0)
 
-lepptyes = Checkbutton(frame1, bg="LightCyan2", text="Choose lepton momentum (GeV)\n (default 25)",  
+lepptyes = Checkbutton(frame1, bg="LightCyan2", text="Choose minimum \nlepton momentum (GeV)\n (default 25)",  
 	variable = st_lepptcb, onvalue=1,offvalue=0, command=chooseleppt)
 
 st_lepcb = IntVar() #State of checkbox
@@ -233,7 +233,7 @@ def chooseNlep(): #function for checkbox
 	st_lepptcb.set(0)
 	chooseleppt()
 
-lyes = Checkbutton(frame1, text="Choose number leptons", font=("Calibri",10),bg="LightCyan2",
+lyes = Checkbutton(frame1, text="Choose number of charged leptons", font=("Calibri",10),bg="LightCyan2",
 	variable = st_lepcb, onvalue=1,offvalue=0, command=chooseNlep)
 lyes.grid(row=0,column=0, sticky=W) #Define and show checkbox
 
@@ -311,7 +311,7 @@ def chooseNjet(): #Function for checkbox
 	btagmin_val.set(0)
 	btagmax_val.set(9)
 
-jyes = Checkbutton(frame1, text="Choose number jets", bg="LightCyan2", font=("Calibri",10),
+jyes = Checkbutton(frame1, text="Choose number of jets", bg="LightCyan2", font=("Calibri",10),
 	 variable = st_jetcb, onvalue=1,offvalue=0, command=chooseNjet)
 
 jyes.grid(row=8,column=0, sticky=W) #Define and show checkbox
@@ -364,17 +364,16 @@ latestThread = None
 analysisThread=None # last opened thread
 b= None
 
-class browser_thread(threading.Thread):
+class browser_thread(multiprocessing.Process):
     """thread for opening a TBrowser"""
     
     def __init__(self):
-        self.exit = threading.Event()
-        threading.Thread.__init__(self)
+        super(browser_thread,self).__init__()
      
     def run(self):
         global b
         b=ROOT.TBrowser()
-        while not self.exit.is_set():
+        while True:
             continue
         
     def shutdown(self):
@@ -403,10 +402,9 @@ def browser():
     global b
     global latestThread
     if latestThread!= None:
-        latestThread.shutdown()
+        latestThread.terminate()
        # b.Destructor()  
     latestThread =browser_thread()
-    latestThread.setDaemon(True)
     latestThread.start()
 
 
@@ -414,7 +412,7 @@ def browser():
 
 #             activebackground="Black", fg= "White",activeforeground="White", command=browser)
 #rbrowser.grid(row=19)
-#submenu.add_command(label="Root Browser", command=browser)
+submenu.add_command(label="Root Browser", command=browser)
 
 
 ## Fuction for analysis
