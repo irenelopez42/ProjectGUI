@@ -64,6 +64,7 @@ class CheckEtMiss(CheckFile):
         self.etmissMin = EtMissMin
         self.etmissMax = EtMissMax
         
+        
     def check(self,EventObject,histogramDic):
         EtMiss = EventObject["EtMiss"]
         if self.etmissMin > EtMiss.et() or self.etmissMax < EtMiss.et():
@@ -151,7 +152,26 @@ class CheckAngle(CheckFile):
         else:
             histogramDic[self.histogram] = self.angle
         return True
+        
+class CheckLepEta(CheckFile):
+    """checks the lepton eta value"""
 
+    def __init__(self,minEta,maxEta,switch):
+        super(CheckLepEta,self).__init__()
+        self.minEta = minEta
+        self.maxEta = maxEta
+        self.switch = switch
+        
+    def check(self,EventObject,histogramDic):
+        leptons = EventObject["leptons"]
+        for lepton in leptons:
+            if lepton.eta() < self.minEta or lepton.eta() > self.maxEta:
+                if not self.switch:
+                    return False
+        if self.switch:
+            return False
+        return True
+        
 def InvariantMass(lepton1,lepton2):
     return (lepton1.tlv()+lepton2.tlv()).M()
 

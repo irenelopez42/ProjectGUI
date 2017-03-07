@@ -29,7 +29,7 @@ def isGoodMuon(Lepton):
     return True;
     
 def isGoodJet(jet):
-    if jet.pt() < 25: return FalseAH
+    if jet.pt() < 25: return False
     if abs(jet.eta() > 2.5): return False
     if jet.pt() < 50 and abs(jet.eta() < 2.4) and jet.jvf() < 0.5: return False
     return True
