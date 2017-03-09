@@ -693,7 +693,7 @@ def run_analysis():
         
         if nlep_val.get()==1:        
             #Tmass
-            checkTMass = CheckFileSuper.CheckTMass(LepTmass_val.get(),0,"WtMass")
+            checkTMass = CheckFileSuper.CheckTMass(LepTmass_val.get(),LepTmassMax_val.get(),0,"WtMass")
             selection.append(checkTMass)
             histograms.append("WtMass")
 	 
@@ -744,8 +744,8 @@ def run_analysis():
                
                 subselection.append(twoLepFlavour)
 
-            threeLepton = CheckFileSuper.CheckThreeLepton("invMass",InvariantM_val.get(),Range_val.get(),
-                                               LepTmass_val.get(),"WtMass", subselection)                                               
+            threeLepton = CheckFileSuper.CheckThreeLepton("invMass",InvariantM_val.get(),
+                    Range_val.get(), LepTmass_val.get(),LepTmassMax_val.get(),"WtMass", subselection)                                               
             selection.append(threeLepton)
             
             histograms.append("WtMass")
@@ -773,7 +773,7 @@ def run_analysis():
                 subselection.append(twoLepFlavour)
                 
             fourLepton =CheckFileSuper.CheckFourLepton("invMass","invMass2",
-                                                       InvariantM_val.get(),InvariantM2_val.get(),Range_val.get(),subselection)
+            InvariantM_val.get(),InvariantM2_val.get(),Range_val.get(),subselection)
 
             selection.append(fourLepton)
 

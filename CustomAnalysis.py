@@ -101,5 +101,3 @@ def histogramAppend(EventObject,histogramDictionary):
 
 	etmiss = EventObject["EtMiss"]
 	histogramDictionary["etmiss"] = etmiss.et()
-
-
