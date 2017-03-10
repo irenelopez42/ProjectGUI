@@ -950,7 +950,7 @@ okbutton = Button(window, text="OK", font=("Calibri",20), bg="white",
 okbutton.place(relx=0.5, rely=0.77, anchor=CENTER)
 
 def start():
-   wellcomeCanvas.place_forget()
+   welcomeCanvas.place_forget()
    okbutton.place_forget()
 
 okbutton.config(command=start)
