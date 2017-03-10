@@ -1,25 +1,13 @@
 import ROOT
 import glob
-import importlib
 import sys
-import time
 import CustomAnalysis
-import stopping
-import Analysis.JobStatistics
-
 
 #==================================================================
-
-
-
-stop = True
-
 class NewJob(object):
     """This class is a carrier class for a given analysis. It takes care of the technical details like
     file writing, setting up the input tree and providing statistics about the status of the analysis.    
     """
-
-    
     def __init__(self, processName, configuration, inputLocation,list_check,histograms):
         super(NewJob, self).__init__()
         #Configurables
@@ -42,18 +30,13 @@ class NewJob(object):
     def setupTree(self):
       tree = ROOT.TChain("mini")
       for filename in self.InputFiles:
-        #self.log("Adding file: " + filename)
         tree.Add(filename)
-      return tree
-
-                    
+      return tree                    
     def createAnalysis(self, analysisName):
         analysisName = "CustomAnalysis"
-        #importedAnalysisModule = importlib.import_module("Analysis." + analysisName)
         analysis = CustomAnalysis.CustomAnalysis(self.Name,self.list_check,self.histograms)
         analysis.Store.initializeTuple(self.InputTree)
         analysis.setIsData("data" in self.Name.lower())
-        #analysis.setIsQuiet(self.Configuration["Quiet"])
         return analysis
     
     #Execution functions                    
@@ -63,37 +46,25 @@ class NewJob(object):
       self.finalize()
       
     def initialize(self):
-      global stop
-      if stop:
-          self.OutputFile = ROOT.TFile.Open(self.OutputFileLocation + ".root","RECREATE")
-          self.InputTree = self.setupTree()
-          self.Analysis  = self.createAnalysis(self.Configuration["Analysis"])
-          self.determineMaxEvents()
-          self.Analysis.doInitialization()
+        self.OutputFile = ROOT.TFile.Open(self.OutputFileLocation + ".root","RECREATE")
+        self.InputTree = self.setupTree()
+        self.Analysis  = self.createAnalysis(self.Configuration["Analysis"])
+        self.determineMaxEvents()
+        self.Analysis.doInitialization()
         
     def execute(self):
-      global stop
-      n=0
-      while stop and n < self.MaxEvents:
+      for n in xrange(self.MaxEvents):
         self.InputTree.GetEntry(n)
         self.Analysis.doAnalysis()
-        n = n+1
         
     def finalize(self):
-      global stop
-      if stop:
-          self.Analysis.doFinalization()
-      if self.OutputFile!= None:
-          self.OutputFile.Close()
+        self.Analysis.doFinalization()
+        self.OutputFile.Close()
     
-      print stop
-
-
     # Helper functions
     def determineMaxEvents(self):
       nentries= self.InputTree.GetEntries()
       if nentries==0:
-        #self.log("Empty files! Abort!")
         sys.exit(1)
       
       if self.MaxEvents > nentries:

@@ -2,22 +2,30 @@ import NewBaseAnalysis
 import NewAnalysisHelpers as AH
 import NewHistManager as HM
 
-
 class CustomAnalysis(NewBaseAnalysis.Analysis):
+    """the object for the analysis specified by the selected options in the GUI."""
 	
-	def __init__(self, store, checkList,histograms):
-		super(CustomAnalysis, self).__init__(store)
-		self.checkList = checkList
-		self.histograms = histograms
-		self.histValDic ={}
-		self.histObjDic ={}
+    def __init__(self, store, checkList,histograms):
+        """checkList is the list of CheckFile objects. Histograms
+           is the histograms that will be plotted. HistObjDic is the dictionary
+           with key/value histogram name/ histrogram ROOT objects. HistValDic
+           is the dictionary with key/value  histogram name/ appropriate event 
+           data"""
+        super(CustomAnalysis, self).__init__(store)
+        self.checkList = checkList
+        self.histograms = histograms
+        self.histValDic ={}
+        self.histObjDic ={}
 
-	def initialize(self):
-		for histogram in self.histograms:
-			self.histObjDic[histogram] = HM.returnHistogram(histogram)
+    def initialize(self):
+        """build a dictionary with the key being the histogram name 
+           and the value being the ROOT histogram object"""
+        for histogram in self.histograms:
+		self.histObjDic[histogram] = HM.returnHistogram(histogram)
 
-	def analyze(self):
-         eventinfo = self.Store.getEventInfo()
+    def analyze(self):
+         """checks an event satisfies the conditions"""
+         eventinfo = self.Store.getEventInfo() #Store contains the current event
          leptons = AH.selectAndSortContainer(self.Store.getLeptons(),AH.isGoodLepton, lambda p: p.pt())
          jets = AH.selectAndSortContainer(self.Store.getJets(),AH.isGoodJet, lambda p: p.pt())
          EtMiss = self.Store.getEtMiss()
@@ -40,8 +48,8 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
          return True
 
 
-	def finalize(self):
-		HM.writeHist(self.histObjDic)
+    def finalize(self):
+        HM.writeHist(self.histObjDic)
 
 def histogramAppend(EventObject,histogramDictionary):
 
@@ -97,7 +105,5 @@ def histogramAppend(EventObject,histogramDictionary):
 			histogramDictionary["traillep_charge"] = trailLepton.charge()
 			histogramDictionary["traillep_type"] = trailLepton.pdgId()
    
-
-
 	etmiss = EventObject["EtMiss"]
 	histogramDictionary["etmiss"] = etmiss.et()

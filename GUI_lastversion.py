@@ -17,9 +17,7 @@ import glob
 import os
 import CustomConfiguration
 import NewJob
-import stopping
 import ttk
-import pathos.multiprocessing as mp
 import multiprocessing
 
 window = Tk()
@@ -55,7 +53,6 @@ physCanvas = Canvas(frameOUT, width=90, height=87)
 physCanvas.place(relx=1, rely=1, anchor=SE)
 physCanvas.create_image(46,44, image=physicist)
 
-
 questionmark = PhotoImage(file="questionmark2.png") #define photo for the question marks with info
 
 #Widgets:
@@ -64,7 +61,6 @@ questionmark = PhotoImage(file="questionmark2.png") #define photo for the questi
 
 nlep_val = IntVar()
 nlep_val.set(0) # initialize a string for number of leptons
-
 
 OptionsLep = Frame(frame1) #Frame to share extra options for leptons
 
@@ -86,7 +82,6 @@ InvariantM2_val = IntVar()
 InvariantM2_val.set(0)    #Invariant mass
 Range_val = IntVar()
 Range_val.set(0)    #Range of invariant mass
-
 
 b1_LepCharge = Radiobutton(OptionsLep, text="Same charge",
                         variable=TwoLepcharge_val, value=1)
@@ -120,7 +115,8 @@ def chooseLepflavour():
         b2_LepFlavour.grid_forget()
         del TwoLepflavour_val
 
-def validate(action, index, value_if_allowed, prior_value, text, validation_type, trigger_type, widget_name):
+def validate(action, index, value_if_allowed, prior_value, text, 
+             validation_type, trigger_type, widget_name):
     if text in '0123456789+':
         try:
             int(value_if_allowed)
@@ -132,8 +128,10 @@ def validate(action, index, value_if_allowed, prior_value, text, validation_type
 
 vcmd = (window.register(validate), '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
 emptyf = Frame(OptionsLep)
-entry_InvariantM = Entry(emptyf, textvariable=InvariantM_val, validate='key', vcmd=vcmd, width=3)
-entry_Range = Entry(emptyf, textvariable=Range_val, validate='key', vcmd=vcmd, width=3)
+entry_InvariantM = Entry(emptyf, textvariable=InvariantM_val, validate='key', 
+                         vcmd=vcmd, width=3)
+entry_Range = Entry(emptyf, textvariable=Range_val, validate='key', 
+                    vcmd=vcmd, width=3)
 plusminus = Label(emptyf, text="±")
 
 def chooseInvMass():
@@ -167,10 +165,13 @@ qinvmass = Canvas(OptionsLep, width=16, height=16)
 qinvmass.create_image(8,8, image=questionmark) #Question mark to be next to "invariant mass" option
 infoinvmass= Message(OptionsLep, text= "This is the sum of the leptons' rest masses.\nWrite the uncertainty too.",
  bg="White", aspect=300) #Information message
+ 
 def on_enterinvmass(event):
     infoinvmass.grid(row=0, rowspan=8, sticky=SW)
+    
 def on_leaveinvmass(event):
     infoinvmass.grid_forget()
+    
 qinvmass.bind("<Enter>", on_enterinvmass)
 qinvmass.bind("<Leave>", on_leaveinvmass)  #Def and bind two functions for when cursor is over question mark or leaves
 
@@ -178,10 +179,13 @@ qbinvmass = Canvas(OptionsLep, width=16, height=16)
 qbinvmass.create_image(8,8, image=questionmark) #Question mark to be next to "invariant mass of pair" option
 infobinvmass= Message(OptionsLep, text= "Sum of the rest masses of two of these leptons.",
  bg="White", aspect=300) #Information message
+ 
 def on_enterbinvmass(event):
     infobinvmass.grid(row=0, rowspan=8, sticky=SW)
+    
 def on_leavebinvmass(event):
     infobinvmass.grid_forget()
+    
 qbinvmass.bind("<Enter>", on_enterbinvmass)
 qbinvmass.bind("<Leave>", on_leavebinvmass)  #Def and bind two functions for when cursor is over question mark or leaves
 
@@ -189,8 +193,10 @@ qinvmass2 = Canvas(OptionsLep, width=16, height=16)
 qinvmass2.create_image(8,8, image=questionmark) #Question mark to be next to "invariant mass of pair" option
 infoinvmass2= Message(OptionsLep, text= "Sum of the rest masses of the other 2 leptons. Same uncertainty as above",
  bg="White", aspect=300) #Information message
+ 
 def on_enterinvmass2(event):
     infoinvmass2.grid(row=2, rowspan=8, sticky=SW)
+    
 def on_leaveinvmass2(event):
     infoinvmass2.grid_forget()
 qinvmass2.bind("<Enter>", on_enterinvmass2)
@@ -200,10 +206,13 @@ qcharges = Canvas(OptionsLep, width=16, height=16)
 qcharges.create_image(8,8, image=questionmark) #Question mark to be next to "Leptons' charges" option
 infocharges= Message(OptionsLep, text= "Within a pair, but not necessarily with others",
  bg="White", aspect=300) #Information message
+ 
 def on_entercharges(event):
     infocharges.grid(row=0, rowspan=8, sticky=N)
+    
 def on_leavecharges(event):
     infocharges.grid_forget()
+    
 qcharges.bind("<Enter>", on_entercharges)
 qcharges.bind("<Leave>", on_leavecharges)  #Def and bind two functions for when cursor is over question mark or leaves
 
@@ -211,13 +220,15 @@ qflavours = Canvas(OptionsLep, width=16, height=16)
 qflavours.create_image(8,8, image=questionmark) #Question mark to be next to "Flavours' charges" option
 infoflavours= Message(OptionsLep, text= "Within a pair, but not necessarily with others",
  bg="White", aspect=300) #Information message
+ 
 def on_enterflavours(event):
     infoflavours.grid(row=3,rowspan=8, sticky=N)
+    
 def on_leaveflavours(event):
     infoflavours.grid_forget()
+    
 qflavours.bind("<Enter>", on_enterflavours)
 qflavours.bind("<Leave>", on_leaveflavours)  #Def and bind two functions for when cursor is over question mark or leaves
-
 
 def clearFrame():    #function to clear all extra options
     OptionsLep.grid_forget()
@@ -251,7 +262,6 @@ def clearFrame():    #function to clear all extra options
     Range_val.set(0)
     chooseLepchargecb.config(text="Leptons' charge")
     chooseLepflavourcb.config(text="Leptons' flavour")
-
 
 def extLepOpts():
     if nlep_val.get() == 0:
@@ -322,6 +332,7 @@ leppt_val.set(25)
 slider_leppt = Scale(frame1, from_=0, to=100, orient=HORIZONTAL, length=150,variable=leppt_val) #Define slider
 
 st_lepptcb= IntVar() #Checkbutton state
+
 def chooseleppt():  #Function for checkbutton
     if st_lepptcb.get()==1:
         slider_leppt.grid(row=7) #If state 1, show slider
@@ -334,6 +345,7 @@ lepptyes = Checkbutton(frame1, bg="LightCyan2", text="Choose lepton momentum (Ge
 	variable = st_lepptcb, onvalue=1,offvalue=0, command=chooseleppt)
 
 st_lepcb = IntVar() #State of checkbox
+
 def chooseNlep(): #function for checkbox
     if st_lepcb.get()==1:
 	b0_lep.grid(row=1)
@@ -372,13 +384,15 @@ qlep.place(relx=0.61, rely=0.001, anchor=N)
 qlep.create_image(8,8, image=questionmark) #Question mark to be next to "choose lep" option
 infolep= Message(frame1, text= "Choose number of leptons.\nRemember that neutrinos won't be detected",
  bg="White", aspect=300) #Information message
+ 
 def on_enterlep(event):
     infolep.place(relx=0.625, rely=0.0155, anchor=NW)
+    
 def on_leavelep(event):
     infolep.place_forget()
+    
 qlep.bind("<Enter>", on_enterlep)
 qlep.bind("<Leave>", on_leavelep)  #Def and bind two functions for when cursor is over question mark or leaves
-
 
 #Want specific number jets? Enter number.
 
@@ -463,10 +477,13 @@ qjet.place(relx=0.36, rely=0.442)
 qjet.create_image(8,8, image=questionmark)  #Question mark for jets
 infojet= Message(frame1, text= "A quark can decay into a gluon and a quark, creating a jet, which is how we detect them",
  bg="White", aspect=300) #Info message
+ 
 def on_enterjet(event):
     infojet.place(relx=0.395, rely=0.4565, anchor=NW)
+    
 def on_leavejet(event):
     infojet.place_forget()
+    
 qjet.bind("<Enter>", on_enterjet)
 qjet.bind("<Leave>", on_leavejet) #Def and bind two functions for when cursor is over question mark or leaves
 
@@ -474,14 +491,15 @@ qbjet = Canvas(frame1, width=16, height=16)
 qbjet.create_image(8,8, image=questionmark)  #Question mark for b-tagged jets
 infobjet= Message(frame1, text= "B-tagged jets are jets produced by bottom quarks",
  bg="White", aspect=300) #Info message
+ 
 def on_enterbjet(event):
     infobjet.place(relx=0.51, rely=0.555, anchor=NW)
+    
 def on_leavebjet(event):
     infobjet.place_forget()
+    
 qbjet.bind("<Enter>", on_enterbjet)
 qbjet.bind("<Leave>", on_leavebjet) #Def and bind two functions for when cursor is over question mark or leaves
-
-
 
 #Sliders for missing momentum
 
@@ -517,13 +535,15 @@ qmom.place(relx=0.51, rely=0.655)
 qmom.create_image(8,8, image=questionmark) #Question mark for missing momentum
 infomom= Message(frame1, text= "Since neutrinos aren't detected at the ATLAS experiment, we can look for events with missing momentum",
  bg="White", aspect=300)  #Info message
+ 
 def on_entermom(event):
     infomom.place(relx=0.545, rely=0.675, anchor=NW)
+    
 def on_leavemom(event):
     infomom.place_forget()
+    
 qmom.bind("<Enter>", on_entermom)
 qmom.bind("<Leave>", on_leavemom) #Def and bind two functions for when cursor is over question mark or leaves
-
 
 #Percentage of data to analize
 percentg_val = DoubleVar()
@@ -532,8 +552,8 @@ PercentgEntry = Scale(frame1, label="Percentage of data to analize:", bg="LightC
 PercentgEntry.grid(row=17, column=0, columnspan=2, sticky=W)
 
 #Button to open root browser
-latestThread = None
-analysisThread=None # last opened thread
+latestThread = None #analysis thread
+#analysisThread=None # last opened thread
 b= None
 
 class browser_thread(threading.Thread):
@@ -551,14 +571,11 @@ class browser_thread(threading.Thread):
         
     def shutdown(self):
         self.exit.set()
-        
-    def stop(self):
-        NewJob.doNotStop = False
-        print NewJob.doNotStop 
-        
+                
 def abort():
-
-    global makeplots
+    """aborts analysis"""
+    
+    global makeplots #do not draw plots if abort is pressed
     makeplots = False
     global pool
     while pool == None:
@@ -567,7 +584,6 @@ def abort():
         process.terminate()
         process.join()
     
-
 def browser():
     """creates new browser_thread closing
     the previous one"""    
@@ -576,11 +592,9 @@ def browser():
     global latestThread
     if latestThread!= None:
         latestThread.shutdown()
-       # b.Destructor()  
     latestThread =browser_thread()
     latestThread.setDaemon(True)
     latestThread.start()
-
 
 #rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
 
@@ -588,11 +602,9 @@ def browser():
 #rbrowser.grid(row=19)
 #submenu.add_command(label="Root Browser", command=browser)
 
-
 ## Fuction for analysis
 
-analysis = None
-
+#analysis = None
 
 #Button to start analysis
 run = Button(frame1, text="RUN", font=("Calibri",12) ,bg="Green", 
@@ -627,17 +639,16 @@ def update_bar():
 #Label for when plots are being drawn
 drawingp = Label(frame1, text="Drawing plots...",fg="black", height=2, font=("Calibri", 12))
 
-
 histograms =[]
 
-analyser = None
-pool= None
-makeplots = True
+#analyser = None
+pool= None #the pool of jobs
+makeplots = True #whether to draw the plots
 
 def run_analysis():
     """runs the analysis"""  
 
-    global makeplots
+    global makeplots #draw the plots
     makeplots = True
     
     selection = []
@@ -692,7 +703,7 @@ def run_analysis():
             #histograms.append("leadlep_type")  
         
         if nlep_val.get()==1:        
-            #Tmass
+            #transverse mass
             checkTMass = CheckFileSuper.CheckTMass(LepTmass_val.get(),LepTmassMax_val.get(),0,"WtMass")
             selection.append(checkTMass)
             histograms.append("WtMass")
@@ -715,15 +726,12 @@ def run_analysis():
                else:
                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
                selection.append(twoLepFlavour)
-
                
-           if st_InvMasscb.get()==1:
+           if st_InvMasscb.get()==1: #invariant mass of pair
                invMassCheck = CheckFileSuper.CheckInvMass(InvariantM_val.get(),Range_val.get(),0,1,"invMass")
                selection.append(invMassCheck)
                histograms.append("invMass")
                
-                
-            
         if nlep_val.get()==3:
 
             subselection =[]
@@ -751,9 +759,7 @@ def run_analysis():
             histograms.append("WtMass")
             histograms.append("invMass")
             
-        if nlep_val.get() == 4:
-            print "newtest"
-            
+        if nlep_val.get() == 4:           
             subselection =[]
         
             if st_lepchargecb.get()!=0: #lepton charge
@@ -779,38 +785,19 @@ def run_analysis():
 
             histograms.append("invMass")
             histograms.append("invMass2")
-            
-        
-            
-    #if nlep_val.get()>1:
-     #   histograms.append("traillep_pt")
-      #  histograms.append("traillep_eta")
-       # histograms.append("traillep_E")
-        #histograms.append("traillep_phi")
-        #histograms.append("traillep_charge")
-        #histograms.append("traillep_type")
-    
+
     if st_missPcb.get()==1: #missing momentum
         missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),maxmissE_val.get())
 
         selection.append(missE_chk) 
-     
-    """global analyser 
-    analyser = NewRunScript.Analyser()
-    
-    analyser.run(selection,histograms)
-    """
-    
+        
     processingDict = CustomConfiguration.Processes
     print CustomConfiguration.Job["Fraction"]
-
         
     CustomConfiguration.Job["Batch"] = True
-    print "second test"
     jobs = [NewJob.NewJob(processName,CustomConfiguration.Job, fileLocation,selection,histograms) for processName, fileLocation in processingDict.items()]
     jobs = NewRunScript.SortJobsBySize(jobs)
     global pool
-    print "test"
     pool = []
     for job in jobs:
         process = JobPool(job)
@@ -822,10 +809,7 @@ def run_analysis():
     for process in pool:
         process.join()
         update_bar()
-    #pool = mp.ProcessingPool(4)
-             # start with n worker processes
-    #pool.map(NewRunScript.RunJob,jobs)
-    
+   
     progressbar.grid_forget()
     global k
     k = 0
@@ -877,31 +861,18 @@ class JobPool(multiprocessing.Process):
         
     
 class run_thread(threading.Thread):
-    """thread for opening a TBrowser"""
+    """thread object for running the analysis"""
     
     def __init__(self):
         super(run_thread,self).__init__()
 
     def run(self):
-        print "first test"
         run_analysis()
-    
-    def stop(self):
-        raise Exception
-        global stopper
-        stopper.stop()
-        
-  
-
-
-        
-   
+              
 runpressed = False
     
-
 def run_a():
-    """creates new browser_thread closing
-    the previous one"""  
+    """creates an analysis therad"""  
     abortb.grid(row=20)
     plotb.grid_forget()  
     run.grid_forget()
@@ -914,10 +885,8 @@ def run_a():
     latestThread.setDaemon(True)
     latestThread.start()
 
-
 run.config(command = run_a)
 
- 
 def plotting():
     
     plots = glob.glob('Output/*.png')
@@ -940,10 +909,8 @@ def plotting():
 			    listcommands.insert(i+j*4, showplot)
 			    listbuttons.insert(i+j*4, Button(frameOUT, command=listcommands[i+j*4], compound=BOTTOM, text=plots[i+j*4][7:][:-4], image=listphotos[i+j*4]))
 			    listbuttons[i+j*4].grid(row=j+1, column=i+1)
-
     except IndexError:
 	    pass
-
 
 #Button to plot results
 
@@ -956,11 +923,7 @@ listlabels = []
 plotb = Button(frame1, text="PLOT", font=("Calibri", 11) ,bg="Blue", 
              activebackground="Black", fg= "White",activeforeground="White", command=plotting)
 
- 
 plotb.grid(row=20, column=0, sticky=E)
-
-
-
 
 #Add a few functions to menu
 #submenu.add_command(label="Run Analysis", command=run_analysis)
@@ -975,7 +938,6 @@ def on_closing():
          window.destroy()
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
-
 
 #Wellcome message
 wellcome = PhotoImage(file="Wellcome.png")
