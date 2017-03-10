@@ -26,6 +26,9 @@ class CustomAnalysis(NewBaseAnalysis.Analysis):
     def analyze(self):
          """checks an event satisfies the conditions"""
          eventinfo = self.Store.getEventInfo() #Store contains the current event
+         if not AH.StandardEventCuts(eventinfo):
+             return False
+         
          leptons = AH.selectAndSortContainer(self.Store.getLeptons(),AH.isGoodLepton, lambda p: p.pt())
          jets = AH.selectAndSortContainer(self.Store.getJets(),AH.isGoodJet, lambda p: p.pt())
          EtMiss = self.Store.getEtMiss()
