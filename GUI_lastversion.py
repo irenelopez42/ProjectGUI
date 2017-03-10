@@ -939,11 +939,11 @@ def on_closing():
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
 
-#Wellcome message
-wellcome = PhotoImage(file="Wellcome.png")
-wellcomeCanvas = Canvas(window, width=881, height=471)
-wellcomeCanvas.place(relx=0.5, rely=0.5, anchor=CENTER)
-wellcomeCanvas.create_image(441,236, image=wellcome)
+#Welcome message
+welcome = PhotoImage(file="Welcome.png")
+welcomeCanvas = Canvas(window, width=881, height=471)
+welcomeCanvas.place(relx=0.5, rely=0.5, anchor=CENTER)
+welcomeCanvas.create_image(441,236, image=welcome)
 
 okbutton = Button(window, text="OK", font=("Calibri",20), bg="white", 
              activebackground="Black", fg= "black", activeforeground="White") #Button to close wellcome message and start
