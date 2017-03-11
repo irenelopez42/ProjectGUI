@@ -22,6 +22,7 @@ import multiprocessing
 
 window = Tk()
 window.wm_title("Event Analyser") #GUI Name
+window.iconbitmap('@'+'icon.xbm')
 
 #Define a drop down menu in case we need it
 #menu = Menu(window)
@@ -47,11 +48,10 @@ frameOUT.grid_rowconfigure(6, minsize=83, weight=1)
 frameOUT.grid_columnconfigure(0, minsize=50, weight=1)
 frameOUT.grid_columnconfigure(6, minsize=50, weight=1) #These will make the plots appear centered
 
-##Physicist on corner
-physicist = PhotoImage(file="physicist.png")
-physCanvas = Canvas(frameOUT, width=90, height=87)
-physCanvas.place(relx=1, rely=1, anchor=SE)
-physCanvas.create_image(46,44, image=physicist)
+##Icon on corner
+GUIicon = PhotoImage(file="icon.png").subsample(8)
+icon = Label(frameOUT, image=GUIicon, bg="thistle4")
+icon.place(relx=1, rely=1, anchor=SE)
 
 questionmark = PhotoImage(file="questionmark2.png") #define photo for the question marks with info
 
@@ -888,7 +888,7 @@ def run_a():
 run.config(command = run_a)
 
 def plotting():
-    
+    expLabel.place_forget()
     plots = glob.glob('Output/*.png')
     lplots = len(plots)
     try:
@@ -946,7 +946,7 @@ welcomeCanvas.place(relx=0.5, rely=0.5, anchor=CENTER)
 welcomeCanvas.create_image(441,236, image=welcome)
 
 okbutton = Button(window, text="OK", font=("Calibri",20), bg="white", 
-             activebackground="Black", fg= "black", activeforeground="White") #Button to close wellcome message and start
+             activebackground="Black", fg= "black", activeforeground="White") #Button to close welcome message and start
 okbutton.place(relx=0.5, rely=0.77, anchor=CENTER)
 
 def start():
@@ -954,5 +954,10 @@ def start():
    okbutton.place_forget()
 
 okbutton.config(command=start)
-            
+
+#Explanation where the plots are
+explanation = "texttexttexttexttexttexttexttexttexttext\ntexttexttexttexttexttexttext\ntexttexttexttexttexttexttexttext"
+expLabel = Label(frameOUT, text=explanation, bg= "White", borderwidth=20)
+expLabel.place(relx=0.5, rely=0.5, anchor=CENTER)
+
 window.mainloop()
