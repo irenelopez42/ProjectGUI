@@ -62,7 +62,7 @@ class CheckNLep(CheckFile):
         return True
         
 class CheckEtMiss(CheckFile):
-    """checks that the transverse missing momentum is within EtMissMin and
+    """checks that the transverse missing energy is within EtMissMin and
     EtMissMax"""
     
     def __init__(self,EtMissMin,EtMissMax):

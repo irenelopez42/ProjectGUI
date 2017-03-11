@@ -68,7 +68,7 @@ OptionsLep = Frame(frame1) #Frame to share extra options for leptons
 LepTmass_val = IntVar()
 LepTmass_val.set(0)  #Lepton min transverse mass
 LepTmassMax_val = IntVar()
-LepTmassMax_val.set(0)  #Lepton max transverse mass
+LepTmassMax_val.set(200)  #Lepton max transverse mass
 st_lepchargecb = IntVar()
 TwoLepcharge_val = IntVar()
 TwoLepcharge_val.set(1) #2 Leptons: same/diferent charge
@@ -148,9 +148,9 @@ def chooseInvMass():
 	InvariantM_val.set(0)
         Range_val.set(0)
 
-slider_LepTMass = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL, 
+slider_LepTMass = Scale(OptionsLep, from_=0, to=200, orient=HORIZONTAL, 
 			length=170, width=10, variable = LepTmass_val, bg = "lavender",label="Minimum transverse mass") #slider for min transverse mass
-slider_maxLepTMass = Scale(OptionsLep, from_=0, to=100, orient=HORIZONTAL, 
+slider_maxLepTMass = Scale(OptionsLep, from_=0, to=200, orient=HORIZONTAL, 
 			length=170, width=10, variable = LepTmassMax_val, bg = "lavender",label="Maximum transverse mass") #slider for max transverse mass
 chooseLepchargecb = Checkbutton(OptionsLep, text="Leptons' charges", bg ="lavender", variable = st_lepchargecb, onvalue=1,offvalue=0, 				command=chooseLepcharge)
 chooseLepflavourcb = Checkbutton(OptionsLep, text="Leptons' flavours", bg = "lavender", variable = st_lepflavourcb, onvalue=1,offvalue=0, command=chooseLepflavour)
@@ -163,7 +163,7 @@ emptyf2 = Frame(OptionsLep, width="170") #just to mantain OptionsLep width
 
 qinvmass = Canvas(OptionsLep, width=16, height=16) 
 qinvmass.create_image(8,8, image=questionmark) #Question mark to be next to "invariant mass" option
-infoinvmass= Message(OptionsLep, text= "This is the sum of the leptons' rest masses.\nWrite the uncertainty too.",
+infoinvmass= Message(OptionsLep, text= "The invariant mass of the charged leptons",
  bg="White", aspect=300) #Information message
  
 def on_enterinvmass(event):
@@ -177,7 +177,7 @@ qinvmass.bind("<Leave>", on_leaveinvmass)  #Def and bind two functions for when 
 
 qbinvmass = Canvas(OptionsLep, width=16, height=16) 
 qbinvmass.create_image(8,8, image=questionmark) #Question mark to be next to "invariant mass of pair" option
-infobinvmass= Message(OptionsLep, text= "Sum of the rest masses of two of these leptons.",
+infobinvmass= Message(OptionsLep, text= "Finds the lepton pair with the closest invariant \nmass subject to the other conditions.",
  bg="White", aspect=300) #Information message
  
 def on_enterbinvmass(event):
@@ -191,7 +191,7 @@ qbinvmass.bind("<Leave>", on_leavebinvmass)  #Def and bind two functions for whe
 
 qinvmass2 = Canvas(OptionsLep, width=16, height=16) 
 qinvmass2.create_image(8,8, image=questionmark) #Question mark to be next to "invariant mass of pair" option
-infoinvmass2= Message(OptionsLep, text= "Sum of the rest masses of the other 2 leptons. Same uncertainty as above",
+infoinvmass2= Message(OptionsLep, text= "Invariant mass of the other 2 leptons. Same uncertainty as above",
  bg="White", aspect=300) #Information message
  
 def on_enterinvmass2(event):
@@ -251,7 +251,7 @@ def clearFrame():    #function to clear all extra options
     qflavours.grid_forget()
     emptyf2.grid_forget
     LepTmass_val.set(0)
-    LepTmassMax_val.set(0)
+    LepTmassMax_val.set(200)
     st_lepchargecb.set(0)
     st_lepflavourcb.set(0)
     st_InvMasscb.set(0)
@@ -287,6 +287,7 @@ def extLepOpts():
 	qcharges.grid(row=0, sticky=E)
 	chooseLepflavourcb.grid(row=3,sticky=W)
 	qflavours.grid(row=3, sticky=E)
+ 
 	LabelInvMass.config(text="Invariant mass of pair:")
 	LabelInvMass.grid(row=6, sticky=W)
 	qbinvmass.grid(row=6, sticky=E)
@@ -341,7 +342,8 @@ def chooseleppt():  #Function for checkbutton
 	leppt_val.set(25)
 	st_lepptcb.set(0)
 
-lepptyes = Checkbutton(frame1, bg="LightCyan2", text="Choose lepton momentum (GeV)\n (default 25)",  
+lepptyes = Checkbutton(frame1, bg="LightCyan2", text="""Minimum transverse
+ lepton momentum (GeV) (default 25)""",  
 	variable = st_lepptcb, onvalue=1,offvalue=0, command=chooseleppt)
 
 st_lepcb = IntVar() #State of checkbox
@@ -382,7 +384,7 @@ frame1.grid_columnconfigure(1, minsize=180, weight=1)
 qlep = Canvas(frame1, width=16, height=16) 
 qlep.place(relx=0.61, rely=0.001, anchor=N)
 qlep.create_image(8,8, image=questionmark) #Question mark to be next to "choose lep" option
-infolep= Message(frame1, text= "Choose number of leptons.\nRemember that neutrinos won't be detected",
+infolep= Message(frame1, text= """The number of charged leptons in the event""",
  bg="White", aspect=300) #Information message
  
 def on_enterlep(event):
@@ -461,7 +463,7 @@ def chooseNjet(): #Function for checkbox
 	btagmin_val.set(0)
 	btagmax_val.set(9)
 
-jyes = Checkbutton(frame1, text="Choose number jets", bg="LightCyan2", font=("Calibri",10),
+jyes = Checkbutton(frame1, text="Choose number of jets", bg="LightCyan2", font=("Calibri",10),
 	 variable = st_jetcb, onvalue=1,offvalue=0, command=chooseNjet)
 
 jyes.grid(row=8,column=0, sticky=W) #Define and show checkbox
@@ -475,7 +477,7 @@ frame1.grid_rowconfigure(13, minsize=30, weight=1)
 qjet = Canvas(frame1, width=16, height=16)
 qjet.place(relx=0.36, rely=0.442)
 qjet.create_image(8,8, image=questionmark)  #Question mark for jets
-infojet= Message(frame1, text= "A quark can decay into a gluon and a quark, creating a jet, which is how we detect them",
+infojet= Message(frame1, text= "The number of jets in the event. Effectively number of quarks",
  bg="White", aspect=300) #Info message
  
 def on_enterjet(event):
@@ -956,8 +958,13 @@ def start():
 okbutton.config(command=start)
 
 #Explanation where the plots are
-explanation = "texttexttexttexttexttexttexttexttexttext\ntexttexttexttexttexttexttext\ntexttexttexttexttexttexttexttext"
-expLabel = Label(frameOUT, text=explanation, bg= "White", borderwidth=20)
+explanation = """Welcome to Event Analyser! On the left select the features
+ for the events you are looking for. Once you are happy with your selection,
+ press \"Run\". If you want to plot existing plots, press \"Plot\". 
+ The saved plots can be found at \"EventAnalyser\Output\" in the directory
+ you saved the package."""
+ 
+expLabel = Label(frameOUT, text=explanation, borderwidth=20)
 expLabel.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 window.mainloop()
