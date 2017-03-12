@@ -154,7 +154,7 @@ slider_maxLepTMass = Scale(OptionsLep, from_=0, to=200, orient=HORIZONTAL,
 			length=170, width=10, variable = LepTmassMax_val, bg = "lavender",label="Maximum transverse mass") #slider for max transverse mass
 chooseLepchargecb = Checkbutton(OptionsLep, text="Leptons' charges", bg ="lavender", variable = st_lepchargecb, onvalue=1,offvalue=0, 				command=chooseLepcharge)
 chooseLepflavourcb = Checkbutton(OptionsLep, text="Leptons' flavours", bg = "lavender", variable = st_lepflavourcb, onvalue=1,offvalue=0, command=chooseLepflavour)
-chooseInvMass = Checkbutton(OptionsLep, bg="lavender", text="What invariant mass",  
+chooseInvMass = Checkbutton(OptionsLep, bg="lavender", text="Invariant mass:",  
 	variable = st_InvMasscb, onvalue=1,offvalue=0, command=chooseInvMass)
 LabelInvMass = Label(OptionsLep, bg="lavender")
 LabelInvMass2 = Label(OptionsLep, text="Invariant mass of pair 2:", bg="lavender")
@@ -167,7 +167,7 @@ infoinvmass= Message(OptionsLep, text= "The invariant mass of the charged lepton
  bg="White", aspect=300) #Information message
  
 def on_enterinvmass(event):
-    infoinvmass.grid(row=0, rowspan=8, sticky=SW)
+    infoinvmass.grid(row=0, rowspan=8)
     
 def on_leaveinvmass(event):
     infoinvmass.grid_forget()
@@ -177,7 +177,7 @@ qinvmass.bind("<Leave>", on_leaveinvmass)  #Def and bind two functions for when 
 
 qbinvmass = Canvas(OptionsLep, width=16, height=16) 
 qbinvmass.create_image(8,8, image=questionmark) #Question mark to be next to "invariant mass of pair" option
-infobinvmass= Message(OptionsLep, text= "Finds the lepton pair with the closest invariant \nmass subject to the other conditions.",
+infobinvmass= Message(OptionsLep, text= "Finds the lepton pair\nwith the closest\ninvariant mass subject\nto the other conditions.",
  bg="White", aspect=300) #Information message
  
 def on_enterbinvmass(event):
@@ -475,13 +475,13 @@ frame1.grid_rowconfigure(12, minsize=30, weight=1)
 frame1.grid_rowconfigure(13, minsize=30, weight=1)
 
 qjet = Canvas(frame1, width=16, height=16)
-qjet.place(relx=0.36, rely=0.442)
+qjet.place(relx=0.4, rely=0.442)
 qjet.create_image(8,8, image=questionmark)  #Question mark for jets
 infojet= Message(frame1, text= "The number of jets in the event. Effectively number of quarks",
  bg="White", aspect=300) #Info message
  
 def on_enterjet(event):
-    infojet.place(relx=0.395, rely=0.4565, anchor=NW)
+    infojet.place(relx=0.435, rely=0.4565, anchor=NW)
     
 def on_leavejet(event):
     infojet.place_forget()
@@ -958,13 +958,14 @@ def start():
 okbutton.config(command=start)
 
 #Explanation where the plots are
-explanation = """Welcome to Event Analyser! On the left select the features
- for the events you are looking for. Once you are happy with your selection,
- press \"Run\". If you want to plot existing plots, press \"Plot\". 
- The saved plots can be found at \"EventAnalyser\Output\" in the directory
- you saved the package."""
+explanation = """Welcome to Event Analyser! 
+ On the left select the features for the events you are
+ looking for. Once you are happy with your selection, press \"Run\". 
+ If you want to plot existing plots, press \"Plot\". 
+ The saved plots can be found at \"EventAnalyser\Output\" 
+ in the directory where you saved the package."""
  
-expLabel = Label(frameOUT, text=explanation, borderwidth=20)
+expLabel = Label(frameOUT, text=explanation, borderwidth=20, font=("Calibri",12))
 expLabel.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 window.mainloop()
