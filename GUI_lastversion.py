@@ -7,9 +7,10 @@ Created on Mon Feb  6 14:25:40 2017
 
 import ROOT
 import Tkinter as tk 
-from Tkinter import Scrollbar, Canvas, Frame, Label, Button, Radiobutton, IntVar
-from Tkinter import PhotoImage, Scale, Checkbutton, Entry, Message, Spinbox, Toplevel
-from Tkinter import HORIZONTAL,W,SE,NW,LEFT,RIGHT,BOTTOM,CENTER,BOTH,N,SW,Y,E, DoubleVar
+from Tkinter import Scrollbar, Canvas, Frame, Label, Button, Radiobutton
+from Tkinter import PhotoImage, Scale, Checkbutton, Entry, Message, Spinbox
+from Tkinter import HORIZONTAL,W,SE,NW,LEFT,RIGHT,BOTTOM, Toplevel, IntVar
+from Tkinter import CENTER,BOTH,N,SW,Y,E, DoubleVar
 import tkMessageBox
 import threading
 import CheckFileSuper
@@ -663,49 +664,7 @@ PercentgEntry = Scale(frame1, label="Percentage of data to analize:",
     resolution=0.5,variable = percentg_val)
 PercentgEntry.grid(row=17, column=0, columnspan=2, sticky=W)
 
-
-
-#Button to open root browser
 latestThread = None #analysis thread
-b= None
-
-class browser_thread(threading.Thread):
-    """thread for opening a TBrowser"""
-    
-    def __init__(self):
-        self.exit = threading.Event()
-        threading.Thread.__init__(self)
-     
-    def run(self):
-        global b
-        b=ROOT.TBrowser()
-        while not self.exit.is_set():
-            continue
-        
-    def shutdown(self):
-        self.exit.set()
-    
-def browser():
-    """creates new browser_thread closing
-    the previous one"""    
-    
-    global b
-    global latestThread
-    if latestThread!= None:
-        latestThread.shutdown()
-    latestThread =browser_thread()
-    latestThread.setDaemon(True)
-    latestThread.start()
-
-"""
-rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10),
-    bg="Blue", 
-activebackground="Black", fg= "White",activeforeground="White", 
-    command=browser)
-rbrowser.grid(row=19)
-submenu.add_command(label="Root Browser", command=browser)
-"""
-
 
 ## Everything concerning running the analysis
 
@@ -1012,7 +971,7 @@ def plotting():
 			    photo2 = photo.subsample(6)
 			    listphotos.insert(i+j*4, photo2)
 			    def showplot(p=i,q=j):
-				"""when plot clicked, open a new window with original size"""
+				"when plot clicked, open a new window with original size"
 				newwin = Toplevel()
 				topscrollbar = Scrollbar(newwin)
 				topscrollbar.pack(side=RIGHT, fill=Y)
@@ -1026,7 +985,8 @@ def plotting():
 			    listcommands.insert(i+j*4, showplot)
 			    listbuttons.insert(i+j*4, Button(frameOUT, 
                             command=listcommands[i+j*4], compound=BOTTOM, 
-                            text=plots[i+j*4][7:][:-4], image=listphotos[i+j*4]))
+                            text=plots[i+j*4][7:][:-4], 
+                            image=listphotos[i+j*4]))
 			    listbuttons[i+j*4].grid(row=j+1, column=i+1)
     except IndexError:
 	    pass
@@ -1065,8 +1025,9 @@ welcomeCanvas = Canvas(window, width=881, height=471)
 welcomeCanvas.place(relx=0.5, rely=0.5, anchor=CENTER)
 welcomeCanvas.create_image(441,236, image=welcome)
 
+#Button to close welcome message and start
 okbutton = Button(window, text="OK", font=("Calibri",20), bg="white", 
-             activebackground="Black", fg= "black", activeforeground="White") #Button to close welcome message and start
+             activebackground="Black", fg= "black", activeforeground="White") 
 okbutton.place(relx=0.5, rely=0.77, anchor=CENTER)
 
 def start():
