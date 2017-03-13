@@ -7,9 +7,9 @@ Created on Mon Feb  6 14:25:40 2017
 
 import ROOT
 import Tkinter as tk 
-from Tkinter import Scrollbar, Canvas, Frame, Label, Radiobutton, IntVar,
+from Tkinter import Scrollbar, Canvas, Frame, Label, Radiobutton, IntVar
 from Tkinter import PhotoImage, Scale, Checkbutton, Entry, Message, Spinbox
-from Tkinter import HORIZONTAL,W,SE,NW,LEFT,BOTH,N,SW,Y,E, DoubleVar
+from Tkinter import HORIZONTAL,W,SE,NW,LEFT,BOTH,N,SW,Y,E, DoubleVar, Button
 import tkMessageBox
 import threading
 import CheckFileSuper
@@ -1000,17 +1000,16 @@ def plotting():
 			    photo2 = photo.subsample(6)
 			    listphotos.insert(i+j*4, photo2)
 			    def showplot(p=i,q=j):
-                  """when plot clicked, open a new window with original size"""
-				    newwin = Toplevel()
-				    topscrollbar = Scrollbar(newwin)
-				    topscrollbar.pack(side=RIGHT, fill=Y)
-				    topcanvas = Canvas(newwin, width=900, 
+                       newwin = Toplevel()
+                       topscrollbar = Scrollbar(newwin)
+                       topscrollbar.pack(side=RIGHT, fill=Y
+                       topcanvas = Canvas(newwin, width=900, 
                               height=2000, yscrollcommand=topscrollbar.set,
                               scrollregion=(0,0,0,850))
-				    topcanvas.pack()
-				    bigplot = topcanvas.create_image(450,420, 
-                            image = listphotosbig[p+q*4])
-                            topscrollbar.config(command=topcanvas.yview)
+                              topcanvas.pack()	    
+                        bigplot = topcanvas.create_image(450,420, 
+                    image = listphotosbig[p+q*4])
+                    topscrollbar.config(command=topcanvas.yview)
 			    listcommands.insert(i+j*4, showplot)
 			    listbuttons.insert(i+j*4, Button(frameOUT, 
                         command=listcommands[i+j*4], compound=BOTTOM, 
@@ -1038,6 +1037,7 @@ plotb.grid(row=20, column=0, sticky=E)
 #submenu.add_command(label="Plot Results", command=plotting)
 
 #When they try to leave analysis aborted
+
 
 def on_closing():
     """Shows warning if the interface is closed while the analysis runs"""
