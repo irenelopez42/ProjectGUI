@@ -6,7 +6,10 @@ Created on Mon Feb  6 14:25:40 2017
 """
 
 import ROOT
-from Tkinter import * 
+import Tkinter as tk 
+from Tkinter import Scrollbar, Canvas, Frame, Label, Radiobutton, IntVar,
+from Tkinter import PhotoImage, Scale, Checkbutton, Entry, Message, Spinbox
+from Tkinter import HORIZONTAL,W,SE,NW,LEFT,BOTH,N,SW,Y,E, DoubleVar
 import tkMessageBox
 import threading
 import CheckFileSuper
@@ -20,20 +23,20 @@ import NewJob
 import ttk
 import multiprocessing
 
-window = Tk()
+window = tk.Tk()
 window.wm_title("Event Analyser") #GUI Name
 window.iconbitmap('@'+'icon.xbm')
 
-#Define a drop down menu in case we need it
-#menu = Menu(window)
-#window.config(menu=menu)
-#submenu = Menu(menu)
-#menu.add_cascade(label="More", menu=submenu)
-
-#Canvas and scrollbar
+"""Define a drop down menu in case we need it
+menu = Menu(window)
+window.config(menu=menu)
+submenu = Menu(menu)
+menu.add_cascade(label="More", menu=submenu)
+Canvas and scrollbar"""
 
 scrollbar = Scrollbar(window)
-canvas = Canvas(window, width=460, height=700, yscrollcommand=scrollbar.set, scrollregion=(0,0,0,890))
+canvas = Canvas(window, width=460, height=700, yscrollcommand=scrollbar.set,
+    scrollregion=(0,0,0,890))
 canvas.pack(side=LEFT)
 scrollbar.pack(side=LEFT, fill=Y)
 scrollbar.config(command=canvas.yview)
@@ -41,19 +44,23 @@ scrollbar.config(command=canvas.yview)
 #Create invisible frames to organize layout
 frame1 = Frame(window, width="200", padx=10) #where widgets will be
 canvas.create_window(230,440, window=frame1)
-frameOUT = Frame(window, width="812", height="700", bg="thistle4") #where plots will show
+#where plots will show
+frameOUT = Frame(window, width="812", height="700", bg="thistle4") 
+
 frameOUT.pack(side=LEFT, fill=BOTH, expand=1)
+#These will make the plots appear centered
 frameOUT.grid_rowconfigure(0, minsize=83, weight=1)
 frameOUT.grid_rowconfigure(6, minsize=83, weight=1)
 frameOUT.grid_columnconfigure(0, minsize=50, weight=1)
-frameOUT.grid_columnconfigure(6, minsize=50, weight=1) #These will make the plots appear centered
+frameOUT.grid_columnconfigure(6, minsize=50, weight=1) 
 
-##Icon on corner
+#Icon on corner
 GUIicon = PhotoImage(file="icon.png").subsample(8)
 icon = Label(frameOUT, image=GUIicon, bg="thistle4")
 icon.place(relx=1, rely=1, anchor=SE)
 
-questionmark = PhotoImage(file="questionmark2.png") #define photo for the question marks with info
+#define photo for the question marks with info
+questionmark = PhotoImage(file="questionmark2.png") 
 
 #Widgets:
     
@@ -83,10 +90,11 @@ InvariantM2_val.set(0)    #Invariant mass
 Range_val = IntVar()
 Range_val.set(0)    #Range of invariant mass
 
+#Checkboxes for same/opposite charge
 b1_LepCharge = Radiobutton(OptionsLep, text="Same charge",
-                        variable=TwoLepcharge_val, value=1)
+    variable=TwoLepcharge_val, value=1)
 b2_LepCharge = Radiobutton(OptionsLep, text="Opposite charge",
-                        variable=TwoLepcharge_val, value=-1)  #Checkboxes for same/opposite charge
+    variable=TwoLepcharge_val, value=-1)  
 
 def chooseLepcharge():
     TwoLepcharge_val = IntVar()
@@ -99,10 +107,11 @@ def chooseLepcharge():
         b2_LepCharge.grid_forget()
         del TwoLepcharge_val
 
+#Checkboxes for same/diferent flavour
 b1_LepFlavour = Radiobutton(OptionsLep, text="Same flavour",
-                        variable=TwoLepflavour_val, value=1)
+    variable=TwoLepflavour_val, value=1)
 b2_LepFlavour = Radiobutton(OptionsLep, text="Different flavour",
-                        variable=TwoLepflavour_val, value=-1)  #Checkboxes for same/diferent flavour
+    variable=TwoLepflavour_val, value=-1)  
 
 def chooseLepflavour():
     TwoLepflavour_val = IntVar()
@@ -126,7 +135,8 @@ def validate(action, index, value_if_allowed, prior_value, text,
     else:
         return False
 
-vcmd = (window.register(validate), '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
+vcmd = (window.register(validate), '%d', '%i', '%P', '%s', '%S', '%v', 
+'%V', '%W')
 emptyf = Frame(OptionsLep)
 entry_InvariantM = Entry(emptyf, textvariable=InvariantM_val, validate='key', 
                          vcmd=vcmd, width=3)
@@ -148,23 +158,41 @@ def chooseInvMass():
 	InvariantM_val.set(0)
         Range_val.set(0)
 
-slider_LepTMass = Scale(OptionsLep, from_=0, to=200, orient=HORIZONTAL, 
-			length=170, width=10, variable = LepTmass_val, bg = "lavender",label="Minimum transverse mass") #slider for min transverse mass
-slider_maxLepTMass = Scale(OptionsLep, from_=0, to=200, orient=HORIZONTAL, 
-			length=170, width=10, variable = LepTmassMax_val, bg = "lavender",label="Maximum transverse mass") #slider for max transverse mass
-chooseLepchargecb = Checkbutton(OptionsLep, text="Leptons' charges", bg ="lavender", variable = st_lepchargecb, onvalue=1,offvalue=0, 				command=chooseLepcharge)
-chooseLepflavourcb = Checkbutton(OptionsLep, text="Leptons' flavours", bg = "lavender", variable = st_lepflavourcb, onvalue=1,offvalue=0, command=chooseLepflavour)
+#slider for min transverse mass
+slider_LepTMass = Scale(OptionsLep, from_=0, to=200, orient=HORIZONTAL,
+    length=170, width=10, variable = LepTmass_val,
+    bg = "lavender",label="Minimum transverse mass") 
+
+#slider for max transverse mass                        
+slider_maxLepTMass = Scale(OptionsLep, from_=0, to=200, orient=HORIZONTAL,
+    length=170, width=10, variable = LepTmassMax_val,
+    bg = "lavender",label="Maximum transverse mass")
+                        
+chooseLepchargecb = Checkbutton(OptionsLep, text="Leptons' charges", 
+    bg ="lavender", variable = st_lepchargecb, onvalue=1,
+    offvalue=0, command=chooseLepcharge)
+chooseLepflavourcb = Checkbutton(OptionsLep, text="Leptons' flavours",
+    bg = "lavender", variable = st_lepflavourcb, onvalue=1,
+    offvalue=0, command=chooseLepflavour)                      
 chooseInvMass = Checkbutton(OptionsLep, bg="lavender", text="Invariant mass:",  
-	variable = st_InvMasscb, onvalue=1,offvalue=0, command=chooseInvMass)
+variable = st_InvMasscb, onvalue=1,offvalue=0, command=chooseInvMass)
 LabelInvMass = Label(OptionsLep, bg="lavender")
-LabelInvMass2 = Label(OptionsLep, text="Invariant mass of pair 2:", bg="lavender")
-entry_InvariantM2 =Entry(OptionsLep, textvariable=InvariantM2_val, validate='key', vcmd=vcmd, width=3) #Entry for invariant mass of 2nd pair (4 leptons case)  
+LabelInvMass2 = Label(OptionsLep, text="Invariant mass of pair 2:",
+    bg="lavender")
+                    
+#Entry for invariant mass of 2nd pair (4 leptons case)  
+entry_InvariantM2 =Entry(OptionsLep, textvariable=InvariantM2_val, 
+    validate='key', vcmd=vcmd, width=3) 
 emptyf2 = Frame(OptionsLep, width="170") #just to mantain OptionsLep width
 
 qinvmass = Canvas(OptionsLep, width=16, height=16) 
-qinvmass.create_image(8,8, image=questionmark) #Question mark to be next to "invariant mass" option
-infoinvmass= Message(OptionsLep, text= "The invariant mass of the charged leptons",
- bg="White", aspect=300) #Information message
+
+#Question mark to be next to "invariant mass" option
+qinvmass.create_image(8,8, image=questionmark) 
+
+infoinvmass= Message(OptionsLep,
+    text= "The invariant mass of the charged leptons",
+    bg="White", aspect=300) #Information message
  
 def on_enterinvmass(event):
     infoinvmass.grid(row=0, rowspan=8)
@@ -172,12 +200,18 @@ def on_enterinvmass(event):
 def on_leaveinvmass(event):
     infoinvmass.grid_forget()
     
+#Def and bind two functions for when cursor is over question mark or leaves
 qinvmass.bind("<Enter>", on_enterinvmass)
-qinvmass.bind("<Leave>", on_leaveinvmass)  #Def and bind two functions for when cursor is over question mark or leaves
+qinvmass.bind("<Leave>", on_leaveinvmass)  
 
+#Question mark to be next to "invariant mass of pair" option
 qbinvmass = Canvas(OptionsLep, width=16, height=16) 
-qbinvmass.create_image(8,8, image=questionmark) #Question mark to be next to "invariant mass of pair" option
-infobinvmass= Message(OptionsLep, text= "Finds the lepton pair\nwith the closest\ninvariant mass subject\nto the other conditions.",
+qbinvmass.create_image(8,8, image=questionmark)
+
+infobinvmass= Message(OptionsLep, text= """Finds the lepton pair
+with the closest
+invariant mass subject
+to the other conditions.""",
  bg="White", aspect=300) #Information message
  
 def on_enterbinvmass(event):
@@ -186,12 +220,16 @@ def on_enterbinvmass(event):
 def on_leavebinvmass(event):
     infobinvmass.grid_forget()
     
+#Def and bind two functions for when cursor is over question mark or leavess
 qbinvmass.bind("<Enter>", on_enterbinvmass)
-qbinvmass.bind("<Leave>", on_leavebinvmass)  #Def and bind two functions for when cursor is over question mark or leaves
+qbinvmass.bind("<Leave>", on_leavebinvmass)  
 
+#Question mark to be next to "invariant mass of pair" option
 qinvmass2 = Canvas(OptionsLep, width=16, height=16) 
-qinvmass2.create_image(8,8, image=questionmark) #Question mark to be next to "invariant mass of pair" option
-infoinvmass2= Message(OptionsLep, text= "Invariant mass of the other 2 leptons. Same uncertainty as above",
+qinvmass2.create_image(8,8, image=questionmark) 
+
+infoinvmass2= Message(OptionsLep, text= """Invariant mass of the other
+ 2 leptons. Same uncertainty as above""",
  bg="White", aspect=300) #Information message
  
 def on_enterinvmass2(event):
@@ -199,13 +237,17 @@ def on_enterinvmass2(event):
     
 def on_leaveinvmass2(event):
     infoinvmass2.grid_forget()
+    
+#Def and bind two functions for when cursor is over question mark or leaves
 qinvmass2.bind("<Enter>", on_enterinvmass2)
-qinvmass2.bind("<Leave>", on_leaveinvmass2)  #Def and bind two functions for when cursor is over question mark or leaves
+qinvmass2.bind("<Leave>", on_leaveinvmass2)  
 
+#Question mark to be next to "Leptons' charges" option
 qcharges = Canvas(OptionsLep, width=16, height=16) 
-qcharges.create_image(8,8, image=questionmark) #Question mark to be next to "Leptons' charges" option
-infocharges= Message(OptionsLep, text= "Within a pair, but not necessarily with others",
- bg="White", aspect=300) #Information message
+qcharges.create_image(8,8, image=questionmark)
+infocharges= Message(OptionsLep, 
+    text= "Within a pair, but not necessarily with others",
+    bg="White", aspect=300) #Information message
  
 def on_entercharges(event):
     infocharges.grid(row=0, rowspan=8, sticky=N)
@@ -213,13 +255,16 @@ def on_entercharges(event):
 def on_leavecharges(event):
     infocharges.grid_forget()
     
+#Def and bind two functions for when cursor is over question mark or leaves
 qcharges.bind("<Enter>", on_entercharges)
-qcharges.bind("<Leave>", on_leavecharges)  #Def and bind two functions for when cursor is over question mark or leaves
+qcharges.bind("<Leave>", on_leavecharges)  
 
+#Question mark to be next to "Flavours' charges" option
 qflavours = Canvas(OptionsLep, width=16, height=16) 
-qflavours.create_image(8,8, image=questionmark) #Question mark to be next to "Flavours' charges" option
-infoflavours= Message(OptionsLep, text= "Within a pair, but not necessarily with others",
- bg="White", aspect=300) #Information message
+qflavours.create_image(8,8, image=questionmark) 
+infoflavours= Message(OptionsLep, 
+    text= "Within a pair, but not necessarily with others",
+    bg="White", aspect=300) #Information message
  
 def on_enterflavours(event):
     infoflavours.grid(row=3,rowspan=8, sticky=N)
@@ -227,8 +272,9 @@ def on_enterflavours(event):
 def on_leaveflavours(event):
     infoflavours.grid_forget()
     
+#Def and bind two functions for when cursor is over question mark or leaves
 qflavours.bind("<Enter>", on_enterflavours)
-qflavours.bind("<Leave>", on_leaveflavours)  #Def and bind two functions for when cursor is over question mark or leaves
+qflavours.bind("<Leave>", on_leaveflavours) 
 
 def clearFrame():    #function to clear all extra options
     OptionsLep.grid_forget()
@@ -317,20 +363,21 @@ def extLepOpts():
 	emptyf2.grid(row=10)
 
 b0_lep = Radiobutton(frame1, text="0 Leptons",
-                        variable=nlep_val, value=0, command=extLepOpts)
+    variable=nlep_val, value=0, command=extLepOpts)
 b1_lep = Radiobutton(frame1, text="1 Lepton",
-                        variable=nlep_val, value=1, command=extLepOpts)
+    variable=nlep_val, value=1, command=extLepOpts)
 b2_lep = Radiobutton(frame1, text="2 Leptons",
-                        variable=nlep_val, value=2, command=extLepOpts)
+    variable=nlep_val, value=2, command=extLepOpts)
 b3_lep = Radiobutton(frame1, text="3 Leptons",
-                        variable=nlep_val, value=3, command=extLepOpts)
+    variable=nlep_val, value=3, command=extLepOpts)
 b4_lep = Radiobutton(frame1, text="4 Leptons",
-                        variable=nlep_val, value=4, command=extLepOpts)
+    variable=nlep_val, value=4, command=extLepOpts)
 
 leppt_val = IntVar() #Want to select min lepton momentum?
 leppt_val.set(25)
 
-slider_leppt = Scale(frame1, from_=0, to=100, orient=HORIZONTAL, length=150,variable=leppt_val) #Define slider
+slider_leppt = Scale(frame1, from_=0, to=100, orient=HORIZONTAL,
+    length=150,variable=leppt_val) #Define slider
 
 st_lepptcb= IntVar() #Checkbutton state
 
@@ -343,8 +390,8 @@ def chooseleppt():  #Function for checkbutton
 	st_lepptcb.set(0)
 
 lepptyes = Checkbutton(frame1, bg="LightCyan2", text="""Minimum transverse
- lepton momentum (GeV) (default 25)""",  
-	variable = st_lepptcb, onvalue=1,offvalue=0, command=chooseleppt)
+    lepton momentum (GeV) (default 25)""",  
+    variable = st_lepptcb, onvalue=1,offvalue=0, command=chooseleppt)
 
 st_lepcb = IntVar() #State of checkbox
 
@@ -368,8 +415,9 @@ def chooseNlep(): #function for checkbox
 	st_lepptcb.set(0)
 	chooseleppt()
 
-lyes = Checkbutton(frame1, text="Choose number of charged leptons", font=("Calibri",10),bg="LightCyan2",
-	variable = st_lepcb, onvalue=1,offvalue=0, command=chooseNlep)
+lyes = Checkbutton(frame1, text="Choose number of charged leptons", 
+    font=("Calibri",10),bg="LightCyan2",
+    variable = st_lepcb, onvalue=1,offvalue=0, command=chooseNlep)
 lyes.grid(row=0,column=0, sticky=W) #Define and show checkbox
 
 frame1.grid_rowconfigure(1, minsize=50, weight=1)
@@ -381,11 +429,13 @@ frame1.grid_rowconfigure(6, minsize=50, weight=1)
 frame1.grid_rowconfigure(7, minsize=50, weight=1)
 frame1.grid_columnconfigure(1, minsize=180, weight=1)
 
+#Question mark to be next to "choose lep" option
 qlep = Canvas(frame1, width=16, height=16) 
 qlep.place(relx=0.61, rely=0.001, anchor=N)
-qlep.create_image(8,8, image=questionmark) #Question mark to be next to "choose lep" option
-infolep= Message(frame1, text= """The number of charged leptons in the event""",
- bg="White", aspect=300) #Information message
+qlep.create_image(8,8, image=questionmark) 
+infolep= Message(frame1, 
+                 text= """The number of charged leptons in the event""",
+                 bg="White", aspect=300) #Information message
  
 def on_enterlep(event):
     infolep.place(relx=0.625, rely=0.0155, anchor=NW)
@@ -393,11 +443,11 @@ def on_enterlep(event):
 def on_leavelep(event):
     infolep.place_forget()
     
+#Def and bind two functions for when cursor is over question mark or leaves
 qlep.bind("<Enter>", on_enterlep)
-qlep.bind("<Leave>", on_leavelep)  #Def and bind two functions for when cursor is over question mark or leaves
+qlep.bind("<Leave>", on_leavelep)  
 
 #Want specific number jets? Enter number.
-
 labelminjet= Label(frame1, text="Minimum:")
 labelmaxjet= Label(frame1, text="Maximum:")
 
@@ -406,15 +456,20 @@ minnjet_val.set(0) # initialize integer for min number of jets
 maxnjet_val = IntVar()
 maxnjet_val.set(9) # initialize integer for max number of jets
 
-minjet_entry = Spinbox(frame1, textvariable=minnjet_val, from_=0, to=9, width=4) #Entry for min number of jets
-maxjet_entry = Spinbox(frame1, textvariable=maxnjet_val, from_=0, to=9, width=4) #Entry for max number of jets
+minjet_entry = Spinbox(frame1, textvariable=minnjet_val, 
+    from_=0, to=9, width=4) #Entry for min number of jets
+maxjet_entry = Spinbox(frame1, textvariable=maxnjet_val, 
+    from_=0, to=9, width=4) #Entry for max number of jets
 
 btagmin_val = IntVar()
 btagmin_val.set(0) #Initialise minimum b-jets
-btagmin_entry = Spinbox(frame1, textvariable=btagmin_val, from_=0, to=9, width=4) #Entry for minimum number of b-tagged jets
+btagmin_entry = Spinbox(frame1, textvariable=btagmin_val, from_=0, to=9, 
+    width=4) #Entry for minimum number of b-tagged jets
 btagmax_val = IntVar()
 btagmax_val.set(9) #Initialise maximum b-jets
-btagmax_entry = Spinbox(frame1, textvariable=btagmax_val, from_=0, to=9, width=4) #Entry for maximum number of b-tagged jets
+btagmax_entry = Spinbox(frame1, textvariable=btagmax_val, from_=0, to=9, 
+    width=4) #Entry for maximum number of b-tagged jets
+                        
 labelminbjet= Label(frame1, text="Minimum:")
 labelmaxbjet= Label(frame1, text="Maximum:") #Labels for b-jets entries
 
@@ -434,7 +489,8 @@ def Nbtagjet(): #function that will show the entry when checkbox clicked
 
 st_btagjetcb = IntVar()
 btaggedyes = Checkbutton(frame1, text="Any b-tagged jets?", bg="LightCyan2",
-	 variable = st_btagjetcb, onvalue=1,offvalue=0, command=Nbtagjet) #Extra checkbox for b-tagged jets
+    variable = st_btagjetcb, onvalue=1,offvalue=0, 
+    command=Nbtagjet) #Extra checkbox for b-tagged jets
 
 st_jetcb = IntVar() #State of checkbox
 def chooseNjet(): #Function for checkbox
@@ -463,8 +519,9 @@ def chooseNjet(): #Function for checkbox
 	btagmin_val.set(0)
 	btagmax_val.set(9)
 
-jyes = Checkbutton(frame1, text="Choose number of jets", bg="LightCyan2", font=("Calibri",10),
-	 variable = st_jetcb, onvalue=1,offvalue=0, command=chooseNjet)
+jyes = Checkbutton(frame1, text="Choose number of jets", bg="LightCyan2", 
+    font=("Calibri",10),variable = st_jetcb, onvalue=1,
+    offvalue=0, command=chooseNjet)
 
 jyes.grid(row=8,column=0, sticky=W) #Define and show checkbox
 
@@ -477,31 +534,35 @@ frame1.grid_rowconfigure(13, minsize=30, weight=1)
 qjet = Canvas(frame1, width=16, height=16)
 qjet.place(relx=0.4, rely=0.442)
 qjet.create_image(8,8, image=questionmark)  #Question mark for jets
-infojet= Message(frame1, text= "The number of jets in the event. Effectively number of quarks",
- bg="White", aspect=300) #Info message
+infojet= Message(frame1, 
+    text= "The number of jets in the event. Effectively number of quarks",
+    bg="White", aspect=300) #Info message
  
 def on_enterjet(event):
     infojet.place(relx=0.435, rely=0.4565, anchor=NW)
     
 def on_leavejet(event):
     infojet.place_forget()
-    
+
+#Def and bind two functions for when cursor is over question mark or leaves   
 qjet.bind("<Enter>", on_enterjet)
-qjet.bind("<Leave>", on_leavejet) #Def and bind two functions for when cursor is over question mark or leaves
+qjet.bind("<Leave>", on_leavejet) 
 
 qbjet = Canvas(frame1, width=16, height=16)
 qbjet.create_image(8,8, image=questionmark)  #Question mark for b-tagged jets
-infobjet= Message(frame1, text= "B-tagged jets are jets produced by bottom quarks",
- bg="White", aspect=300) #Info message
+infobjet= Message(frame1, 
+    text= "B-tagged jets are jets produced by bottom quarks",
+    bg="White", aspect=300) #Info message
  
 def on_enterbjet(event):
     infobjet.place(relx=0.51, rely=0.555, anchor=NW)
     
 def on_leavebjet(event):
     infobjet.place_forget()
-    
+ 
+#Def and bind two functions for when cursor is over question mark or leaves   
 qbjet.bind("<Enter>", on_enterbjet)
-qbjet.bind("<Leave>", on_leavebjet) #Def and bind two functions for when cursor is over question mark or leaves
+qbjet.bind("<Leave>", on_leavebjet) 
 
 #Sliders for missing momentum
 
@@ -510,8 +571,10 @@ minmissE_val.set(0)
 maxmissE_val = IntVar() #initialize integer for max
 maxmissE_val.set(200)
 
-slider_minmissP = Scale(frame1, label="Minimum:", from_=0, to=200, orient=HORIZONTAL, length=200, variable = minmissE_val) #Define slider
-slider_maxmissP = Scale(frame1, label="Maximum:", from_=0, to=200, orient=HORIZONTAL, length=200, variable = maxmissE_val)
+slider_minmissP = Scale(frame1, label="Minimum:", from_=0, to=200, 
+    orient=HORIZONTAL, length=200, variable = minmissE_val) #Define slider
+slider_maxmissP = Scale(frame1, label="Maximum:", from_=0, to=200, 
+    orient=HORIZONTAL, length=200, variable = maxmissE_val)
 
 st_missPcb= IntVar() #Checkbutton state
 def choosemissP():  #Function for checkbutton
@@ -525,8 +588,9 @@ def choosemissP():  #Function for checkbutton
 	slider_maxmissP.grid_forget()
         maxmissE_val.set(200)
 
-minmissPyes = Checkbutton(frame1, text="Missing\n transverse momentum (GeV)", font=("Calibri",10), bg="LightCyan2", 
-	variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
+minmissPyes = Checkbutton(frame1, text="Missing\n transverse momentum (GeV)", 
+    font=("Calibri",10), bg="LightCyan2", 
+    variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
 
 minmissPyes.grid(row=14,column=0, sticky=W) #Define and show checkbutton0
 frame1.grid_rowconfigure(15, minsize=60, weight=1)
@@ -535,8 +599,10 @@ frame1.grid_rowconfigure(16, minsize=60, weight=1)
 qmom = Canvas(frame1, width=16, height=16)
 qmom.place(relx=0.51, rely=0.655)
 qmom.create_image(8,8, image=questionmark) #Question mark for missing momentum
-infomom= Message(frame1, text= "Since neutrinos aren't detected at the ATLAS experiment, we can look for events with missing momentum",
- bg="White", aspect=300)  #Info message
+infomom= Message(frame1, 
+   text= """Since neutrinos aren't detected at the ATLAS experiment, 
+   we can look for events with missing momentum""",
+   bg="White", aspect=300)  #Info message
  
 def on_entermom(event):
     infomom.place(relx=0.545, rely=0.675, anchor=NW)
@@ -544,18 +610,19 @@ def on_entermom(event):
 def on_leavemom(event):
     infomom.place_forget()
     
+#Def and bind two functions for when cursor is over question mark or leaves
 qmom.bind("<Enter>", on_entermom)
-qmom.bind("<Leave>", on_leavemom) #Def and bind two functions for when cursor is over question mark or leaves
-
+qmom.bind("<Leave>", on_leavemom) 
 #Percentage of data to analize
 percentg_val = DoubleVar()
 percentg_val.set(0)
-PercentgEntry = Scale(frame1, label="Percentage of data to analize:", bg="LightCyan2",from_=0, to=100, orient=HORIZONTAL, length=300, resolution=0.5,variable = percentg_val)
+PercentgEntry = Scale(frame1, label="Percentage of data to analize:", 
+    bg="LightCyan2",from_=0, to=100, orient=HORIZONTAL, length=300,
+    resolution=0.5,variable = percentg_val)
 PercentgEntry.grid(row=17, column=0, columnspan=2, sticky=W)
 
 #Button to open root browser
 latestThread = None #analysis thread
-#analysisThread=None # last opened thread
 b= None
 
 class browser_thread(threading.Thread):
@@ -576,7 +643,7 @@ class browser_thread(threading.Thread):
                 
 def abort():
     """aborts analysis"""
-    
+   
     global makeplots #do not draw plots if abort is pressed
     makeplots = False
     global pool
@@ -598,11 +665,14 @@ def browser():
     latestThread.setDaemon(True)
     latestThread.start()
 
-#rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10) ,bg="Blue", 
-
-#             activebackground="Black", fg= "White",activeforeground="White", command=browser)
-#rbrowser.grid(row=19)
-#submenu.add_command(label="Root Browser", command=browser)
+"""
+rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10),
+    bg="Blue", 
+activebackground="Black", fg= "White",activeforeground="White", 
+    command=browser)
+rbrowser.grid(row=19)
+submenu.add_command(label="Root Browser", command=browser)
+"""
 
 ## Fuction for analysis
 
@@ -610,7 +680,7 @@ def browser():
 
 #Button to start analysis
 run = Button(frame1, text="RUN", font=("Calibri",12) ,bg="Green", 
-             activebackground="Black", fg= "White", activeforeground="White")
+    activebackground="Black", fg= "White", activeforeground="White")
 
 run.grid(row=20, column=0)
 
@@ -619,12 +689,12 @@ frame1.grid_rowconfigure(20, minsize=30, weight=1)
 frame1.grid_rowconfigure(21, minsize=30, weight=1)
 
 test = Button(frame1, text="TEST", font=("Calibri",12) ,bg="White", 
-             activebackground="Black", fg= "Black", activeforeground="White")
+    activebackground="Black", fg= "Black", activeforeground="White")
 
 #Abort button (doesn't do anything at the moment)
 abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red", 
-             activebackground="Black", fg= "White", activeforeground="White",command = abort
-             )
+    activebackground="Black", fg= "White", activeforeground="White",
+    command = abort)
 
 #Progress bar
 MAX = 29
@@ -639,7 +709,8 @@ def update_bar():
     window.update_idletasks()
 
 #Label for when plots are being drawn
-drawingp = Label(frame1, text="Drawing plots...",fg="black", height=2, font=("Calibri", 12))
+drawingp = Label(frame1, text="Drawing plots...",fg="black", height=2, 
+    font=("Calibri", 12))
 
 histograms =[]
 
@@ -682,13 +753,14 @@ def run_analysis():
         AH.lep_num = leppt_val.get()
     
     if st_jetcb.get() ==1: #number of jets
-        jetn_chk = CheckFileSuper.CheckNJets(minnjet_val.get(),maxnjet_val.get())
+        jetn_chk = CheckFileSuper.CheckNJets(minnjet_val.get(),
+            maxnjet_val.get())
         selection.append(jetn_chk)
  
         
         if st_btagjetcb.get()==1: #btagging
-            btag_chk = CheckFileSuper.CheckBTag(btagmin_val.get(),btagmin_val.get())
-
+            btag_chk = CheckFileSuper.CheckBTag(btagmin_val.get(),
+                btagmin_val.get())
             selection.append(btag_chk)
             
     if st_lepcb.get() != 0: #number of leptons
@@ -696,66 +768,59 @@ def run_analysis():
         lepn_chk = CheckFileSuper.CheckNLep(nlep_val.get())
         selection.append(lepn_chk)
     
-        #if nlep_val.get()!=0:
-         #   histograms.append("leadlep_pt")
-          #  histograms.append("leadlep_eta")
-           # histograms.append("leadlep_phi")
-            #histograms.append("leadlep_E")
-            #histograms.append("leadlep_charge")
-            #histograms.append("leadlep_type")  
-        
         if nlep_val.get()==1:        
             #transverse mass
-            checkTMass = CheckFileSuper.CheckTMass(LepTmass_val.get(),LepTmassMax_val.get(),0,"WtMass")
+            checkTMass = CheckFileSuper.CheckTMass(LepTmass_val.get(),
+                LepTmassMax_val.get(),0,"WtMass")
             selection.append(checkTMass)
             histograms.append("WtMass")
 	 
         if nlep_val.get()==2:   
- 	    #checkAngle = CheckFileSuper.CheckAngle(angleLepMP_val.get(),"deltaTheta")
-	    #selection.append(checkAngle)
-	    #histograms.append("deltaTheta")
-           
            if st_lepchargecb.get()!=0: #lepton charge
                 if TwoLepcharge_val.get()==1:
                     twoLepCharge = CheckFileSuper.CheckLepCharge("same",0,1)
                 else:
-                    twoLepCharge = CheckFileSuper.CheckLepCharge("different",0,1)
+                    twoLepCharge = CheckFileSuper.CheckLepCharge("different",
+                        0,1)
                 selection.append(twoLepCharge)
             
            if st_lepflavourcb.get()!=0: #lepton flavour
                if TwoLepflavour_val.get()==1:
                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("same",0,1)    
                else:
-                   twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
+                   twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",
+                        0,1)
                selection.append(twoLepFlavour)
                
            if st_InvMasscb.get()==1: #invariant mass of pair
-               invMassCheck = CheckFileSuper.CheckInvMass(InvariantM_val.get(),Range_val.get(),0,1,"invMass")
+               invMassCheck = CheckFileSuper.CheckInvMass(InvariantM_val.get(),
+                    Range_val.get(),0,1,"invMass")
                selection.append(invMassCheck)
                histograms.append("invMass")
                
         if nlep_val.get()==3:
 
             subselection =[]
-        
             if st_lepchargecb.get()!=0: #lepton charge
                 if TwoLepcharge_val.get()==1:
                     twoLepCharge = CheckFileSuper.CheckLepCharge("same",0,1)
                 else:
-                    twoLepCharge = CheckFileSuper.CheckLepCharge("different",0,1)
-                    
+                    twoLepCharge = CheckFileSuper.CheckLepCharge("different",
+                        0,1)   
                 subselection.append(twoLepCharge)
        
             if st_lepflavourcb.get()!=0: #lepton flavour
                 if TwoLepflavour_val.get()==1:
                     twoLepFlavour = CheckFileSuper.CheckLepFlavour("same",0,1)    
                 else:
-                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
+                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",
+                        0,1)
                
                 subselection.append(twoLepFlavour)
 
-            threeLepton = CheckFileSuper.CheckThreeLepton("invMass",InvariantM_val.get(),
-                    Range_val.get(), LepTmass_val.get(),LepTmassMax_val.get(),"WtMass", subselection)                                               
+            threeLepton = CheckFileSuper.CheckThreeLepton("invMass",
+                InvariantM_val.get(),Range_val.get(), LepTmass_val.get(),
+                LepTmassMax_val.get(),"WtMass", subselection)                                               
             selection.append(threeLepton)
             
             histograms.append("WtMass")
@@ -768,20 +833,23 @@ def run_analysis():
                 if TwoLepcharge_val.get()==1:
                     twoLepCharge = CheckFileSuper.CheckLepCharge("same",0,1)
                 else:
-                    twoLepCharge = CheckFileSuper.CheckLepCharge("different",0,1)
+                    twoLepCharge = CheckFileSuper.CheckLepCharge("different",
+                        0,1)
                     
                 subselection.append(twoLepCharge)
        
             if st_lepflavourcb.get()!=0: #lepton flavour
                 if TwoLepflavour_val.get()==1:
-                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("same",0,1)    
+                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("same",
+                        0,1)    
                 else:
-                    twoLepFlavour = CheckFileSuper.CheckLepFlavour("different",0,1)
-               
+                    twoLepFlavour = CheckFileSuper.CheckLepFlavour(
+                        "different",0,1)
                 subselection.append(twoLepFlavour)
                 
-            fourLepton =CheckFileSuper.CheckFourLepton("invMass","invMass2",
-            InvariantM_val.get(),InvariantM2_val.get(),Range_val.get(),subselection)
+            fourLepton =CheckFileSuper.CheckFourLepton("invMass",
+                "invMass2",InvariantM_val.get(),InvariantM2_val.get(),
+                Range_val.get(),subselection)
 
             selection.append(fourLepton)
 
@@ -789,7 +857,8 @@ def run_analysis():
             histograms.append("invMass2")
 
     if st_missPcb.get()==1: #missing momentum
-        missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),maxmissE_val.get())
+        missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),
+            maxmissE_val.get())
 
         selection.append(missE_chk) 
         
@@ -797,7 +866,9 @@ def run_analysis():
     print CustomConfiguration.Job["Fraction"]
         
     CustomConfiguration.Job["Batch"] = True
-    jobs = [NewJob.NewJob(processName,CustomConfiguration.Job, fileLocation,selection,histograms) for processName, fileLocation in processingDict.items()]
+    jobs = [NewJob.NewJob(processName,CustomConfiguration.Job,
+        fileLocation,selection,histograms) for processName, 
+        fileLocation in processingDict.items()]
     jobs = NewRunScript.SortJobsBySize(jobs)
     global pool
     pool = []
@@ -853,7 +924,7 @@ def run_analysis():
     runpressed = False
     
 class JobPool(multiprocessing.Process):
-    
+    """Process object for running a job"""
     def __init__(self,job):
         super(JobPool,self).__init__()
         self.job = job
@@ -904,12 +975,17 @@ def plotting():
 				    newwin = Toplevel()
 				    topscrollbar = Scrollbar(newwin)
 				    topscrollbar.pack(side=RIGHT, fill=Y)
-				    topcanvas = Canvas(newwin, width=900, height=2000, yscrollcommand=topscrollbar.set, scrollregion=(0,0,0,850))
+				    topcanvas = Canvas(newwin, width=900, 
+                              height=2000, yscrollcommand=topscrollbar.set,
+                              scrollregion=(0,0,0,850))
 				    topcanvas.pack()
-				    bigplot = topcanvas.create_image(450,420, image = listphotosbig[p+q*4])
-				    topscrollbar.config(command=topcanvas.yview)
+				    bigplot = topcanvas.create_image(450,420, 
+                            image = listphotosbig[p+q*4])
+                            topscrollbar.config(command=topcanvas.yview)
 			    listcommands.insert(i+j*4, showplot)
-			    listbuttons.insert(i+j*4, Button(frameOUT, command=listcommands[i+j*4], compound=BOTTOM, text=plots[i+j*4][7:][:-4], image=listphotos[i+j*4]))
+			    listbuttons.insert(i+j*4, Button(frameOUT, 
+                        command=listcommands[i+j*4], compound=BOTTOM, 
+                        text=plots[i+j*4][7:][:-4], image=listphotos[i+j*4]))
 			    listbuttons[i+j*4].grid(row=j+1, column=i+1)
     except IndexError:
 	    pass
@@ -923,7 +999,8 @@ listbuttons = []
 listlabels = []
 
 plotb = Button(frame1, text="PLOT", font=("Calibri", 11) ,bg="Blue", 
-             activebackground="Black", fg= "White",activeforeground="White", command=plotting)
+    activebackground="Black", fg= "White",activeforeground="White",
+    command=plotting)
 
 plotb.grid(row=20, column=0, sticky=E)
 
@@ -935,7 +1012,8 @@ plotb.grid(row=20, column=0, sticky=E)
 
 def on_closing():
     if runpressed:
-	 tkMessageBox.showwarning("WARNING","Analysis still runnin.\n Please, press abort")
+	 tkMessageBox.showwarning("WARNING","""Analysis still running. 
+      Please, press abort""")
     else:
          window.destroy()
 
@@ -965,7 +1043,8 @@ explanation = """Welcome to Event Analyser!
  The saved plots can be found at \"EventAnalyser\Output\" 
  in the directory where you saved the package."""
  
-expLabel = Label(frameOUT, text=explanation, borderwidth=20, font=("Calibri",12))
+expLabel = Label(frameOUT, text=explanation, borderwidth=20, 
+    font=("Calibri",12))
 expLabel.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 window.mainloop()
