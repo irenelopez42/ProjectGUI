@@ -7,9 +7,9 @@ Created on Mon Feb  6 14:25:40 2017
 
 import ROOT
 import Tkinter as tk 
-from Tkinter import Scrollbar, Canvas, Frame, Label, Radiobutton, IntVar
-from Tkinter import PhotoImage, Scale, Checkbutton, Entry, Message, Spinbox
-from Tkinter import HORIZONTAL,W,SE,NW,LEFT,BOTH,N,SW,Y,E, DoubleVar, Button
+from Tkinter import Scrollbar, Canvas, Frame, Label, Button, Radiobutton, IntVar
+from Tkinter import PhotoImage, Scale, Checkbutton, Entry, Message, Spinbox, Toplevel
+from Tkinter import HORIZONTAL,W,SE,NW,LEFT,RIGHT,BOTTOM,CENTER,BOTH,N,SW,Y,E, DoubleVar
 import tkMessageBox
 import threading
 import CheckFileSuper
@@ -46,23 +46,14 @@ scrollbar.config(command=canvas.yview)
 frame1 = Frame(window, width="200", padx=10) #where widgets will be
 canvas.create_window(230,440, window=frame1)
 #This will make the frame stay static:
-frame1.grid_rowconfigure(1, minsize=50, weight=1)
-frame1.grid_rowconfigure(2, minsize=50, weight=1)
-frame1.grid_rowconfigure(3, minsize=50, weight=1)
-frame1.grid_rowconfigure(4, minsize=50, weight=1)
-frame1.grid_rowconfigure(5, minsize=50, weight=1)
-frame1.grid_rowconfigure(6, minsize=50, weight=1)
-frame1.grid_rowconfigure(7, minsize=50, weight=1)
-frame1.grid_rowconfigure(9, minsize=30, weight=1)
-frame1.grid_rowconfigure(10, minsize=30, weight=1)
-frame1.grid_rowconfigure(11, minsize=30, weight=1)
-frame1.grid_rowconfigure(12, minsize=30, weight=1)
-frame1.grid_rowconfigure(13, minsize=30, weight=1)
-frame1.grid_rowconfigure(15, minsize=60, weight=1)
-frame1.grid_rowconfigure(16, minsize=60, weight=1)
-frame1.grid_rowconfigure(19, minsize=30, weight=1)
-frame1.grid_rowconfigure(20, minsize=30, weight=1)
-frame1.grid_rowconfigure(21, minsize=30, weight=1)
+for i in range(1,8):
+    frame1.grid_rowconfigure(i, minsize=50, weight=1)
+for i in range(9,14):
+    frame1.grid_rowconfigure(i, minsize=30, weight=1)
+for i in [15,16]:
+    frame1.grid_rowconfigure(i, minsize=60, weight=1)
+for i in range(19,22):
+    frame1.grid_rowconfigure(i, minsize=30, weight=1)
 frame1.grid_columnconfigure(1, minsize=180, weight=1)
 
 frameOUT = Frame(window, width="812", height="700", bg="thistle4") #For plots
@@ -446,7 +437,7 @@ def chooseNlep():
         b2_lep.grid(row=3)
         b3_lep.grid(row=4)
         b4_lep.grid(row=5)
-        lepptyes.grid(row=6)
+        lepptyes.grid(row=6, columnspan=2, sticky=W)
     else:
         nlep_val.set(0)
         clearFrame()
@@ -1021,20 +1012,21 @@ def plotting():
 			    photo2 = photo.subsample(6)
 			    listphotos.insert(i+j*4, photo2)
 			    def showplot(p=i,q=j):
-                       newwin = Toplevel()
-                       topscrollbar = Scrollbar(newwin)
-                       topscrollbar.pack(side=RIGHT, fill=Y
-                       topcanvas = Canvas(newwin, width=900, 
-                              height=2000, yscrollcommand=topscrollbar.set,
-                              scrollregion=(0,0,0,850))
-                              topcanvas.pack()	    
-                        bigplot = topcanvas.create_image(450,420, 
-                    image = listphotosbig[p+q*4])
-                    topscrollbar.config(command=topcanvas.yview)
+				"""when plot clicked, open a new window with original size"""
+				newwin = Toplevel()
+				topscrollbar = Scrollbar(newwin)
+				topscrollbar.pack(side=RIGHT, fill=Y)
+				topcanvas = Canvas(newwin, width=900, 
+                                height=2000, yscrollcommand=topscrollbar.set,
+                                scrollregion=(0,0,0,850))
+				topcanvas.pack()
+				bigplot = topcanvas.create_image(450,420, 
+                                image = listphotosbig[p+q*4])
+                                topscrollbar.config(command=topcanvas.yview)
 			    listcommands.insert(i+j*4, showplot)
 			    listbuttons.insert(i+j*4, Button(frameOUT, 
-                        command=listcommands[i+j*4], compound=BOTTOM, 
-                        text=plots[i+j*4][7:][:-4], image=listphotos[i+j*4]))
+                            command=listcommands[i+j*4], compound=BOTTOM, 
+                            text=plots[i+j*4][7:][:-4], image=listphotos[i+j*4]))
 			    listbuttons[i+j*4].grid(row=j+1, column=i+1)
     except IndexError:
 	    pass
