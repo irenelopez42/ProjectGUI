@@ -22,6 +22,8 @@ import CustomConfiguration
 import NewJob
 import ttk
 import multiprocessing
+import Queue
+
 
 window = tk.Tk()
 window.wm_title("Event Analyser") #GUI Name
@@ -451,7 +453,7 @@ def chooseNlep():
         chooseleppt()
 
 lyes = Checkbutton(frame1, text="Choose number of charged leptons", 
-    font=("Calibri",10),bg="LightCyan2",
+    bg="LightCyan2",
     variable = st_lepcb, onvalue=1,offvalue=0, command=chooseNlep)
 lyes.grid(row=0,column=0, sticky=W) #Define and show checkbox
 
@@ -627,7 +629,7 @@ def choosemissP():
         maxmissE_val.set(200)
 
 minmissPyes = Checkbutton(frame1, text="Missing\n transverse momentum (GeV)", 
-    font=("Calibri",10), bg="LightCyan2", 
+    bg="LightCyan2", 
     variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
 minmissPyes.grid(row=14,column=0, sticky=W) #Define and show checkbutton0
 
@@ -709,7 +711,8 @@ submenu.add_command(label="Root Browser", command=browser)
 
 ## Everything concerning running the analysis
 
-#analysis = None
+#Queue for thread communication
+queue = Queue.Queue()
 
 #Button to start analysis
 run = Button(frame1, text="RUN", font=("Calibri",12) ,bg="Green", 
@@ -919,7 +922,7 @@ def run_analysis():
     pool.reverse()
     for process in pool:
         process.join()
-        update_bar()
+        queue.put(update_bar())
    
     progressbar.grid_forget()
     global k
@@ -948,14 +951,14 @@ def run_analysis():
     del listbuttons[:]
     global listlabels
     del listlabels[:]
-    previousplots=glob.glob('Output/*.png')
+    previousplots=glob.glob('Output/*.gif')
     for plot in previousplots: 
         os.remove(plot)
 
     if not histograms == []:
         NewPlotResults.plot_results(histograms)
 
-    plotting()
+    queue.put(plotting())
     drawingp.grid_forget()
     plotb.grid(row=20, sticky=E) 
     run.grid(row=20)
