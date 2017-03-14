@@ -79,6 +79,7 @@ def drawLegend(paintables, paintingOrder):
 
 def DrawPlot(configuration, histlocation):
     print "Drawing plot: " + histlocation 
+    #tImage = ROOT.TImageDump("Output/" + imn.ImageDic[histlocation]+ ".gif")
     canvas = ROOT.TCanvas( histlocation, "title", 900, 900 )
     
     Paintables = collectPaintables(configuration["Paintables"])
@@ -91,9 +92,10 @@ def DrawPlot(configuration, histlocation):
     canvas.legend = drawLegend(Paintables, Depictions[0].PaintingOrder)
     [d.drawDepiction(Paintables) for d in Depictions]
 
-    canvas.SaveAs("Output/" + imn.ImageDic[histlocation]+ ".png")  
- 
+    canvas.SaveAs("Output/" + imn.ImageDic[histlocation]+ ".gif")
+
 #======================================================================
+
 def plot_results(histograms):
     """
     Main function to be executed when starting the code.

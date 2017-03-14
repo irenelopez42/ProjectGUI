@@ -7,10 +7,9 @@ Created on Mon Feb  6 14:25:40 2017
 
 import ROOT
 import Tkinter as tk 
-from Tkinter import Scrollbar, Canvas, Frame, Label, Button, Radiobutton
-from Tkinter import PhotoImage, Scale, Checkbutton, Entry, Message, Spinbox
-from Tkinter import HORIZONTAL,W,SE,NW,LEFT,RIGHT,BOTTOM, Toplevel, IntVar
-from Tkinter import CENTER,BOTH,N,SW,Y,E, DoubleVar
+from Tkinter import Scrollbar, Canvas, Frame, Label, Button, Radiobutton, IntVar
+from Tkinter import PhotoImage, Scale, Checkbutton, Entry, Message, Spinbox, Toplevel
+from Tkinter import HORIZONTAL,W,SE,NW,LEFT,RIGHT,BOTTOM,CENTER,BOTH,N,SW,Y,E, DoubleVar
 import tkMessageBox
 import threading
 import CheckFileSuper
@@ -66,12 +65,12 @@ frameOUT.grid_columnconfigure(0, minsize=50, weight=1)
 frameOUT.grid_columnconfigure(6, minsize=50, weight=1) 
 
 #Icon on corner
-GUIicon = PhotoImage(file="icon.png").subsample(8)
+GUIicon = PhotoImage(file="icon.gif").subsample(8)
 icon = Label(frameOUT, image=GUIicon, bg="thistle4")
 icon.place(relx=1, rely=1, anchor=SE)
 
 #define photo for the question marks with info
-questionmark = PhotoImage(file="questionmark2.png") 
+questionmark = PhotoImage(file="questionmark2.gif") 
 
 #Widgets:
     
@@ -555,8 +554,8 @@ def chooseNjet():
         btagmin_val.set(0)
         btagmax_val.set(9)
 
-jyes = Checkbutton(frame1, text="Choose number of jets", bg="LightCyan2", 
-    font=("Calibri",10),variable = st_jetcb, onvalue=1,
+jyes = Checkbutton(frame1, text="Choose number of jets", bg="LightCyan2",
+variable = st_jetcb, onvalue=1,
     offvalue=0, command=chooseNjet)
 jyes.grid(row=8,column=0, sticky=W) #Define and show checkbox
 
@@ -664,7 +663,49 @@ PercentgEntry = Scale(frame1, label="Percentage of data to analize:",
     resolution=0.5,variable = percentg_val)
 PercentgEntry.grid(row=17, column=0, columnspan=2, sticky=W)
 
+
+
+#Button to open root browser
 latestThread = None #analysis thread
+b= None
+
+class browser_thread(threading.Thread):
+    """thread for opening a TBrowser"""
+    
+    def __init__(self):
+        self.exit = threading.Event()
+        threading.Thread.__init__(self)
+     
+    def run(self):
+        global b
+        b=ROOT.TBrowser()
+        while not self.exit.is_set():
+            continue
+        
+    def shutdown(self):
+        self.exit.set()
+    
+def browser():
+    """creates new browser_thread closing
+    the previous one"""    
+    
+    global b
+    global latestThread
+    if latestThread!= None:
+        latestThread.shutdown()
+    latestThread =browser_thread()
+    latestThread.setDaemon(True)
+    latestThread.start()
+
+"""
+rbrowser = Button(frame1, text="Root Browser", font=("Calibri", 10),
+    bg="Blue", 
+activebackground="Black", fg= "White",activeforeground="White", 
+    command=browser)
+rbrowser.grid(row=19)
+submenu.add_command(label="Root Browser", command=browser)
+"""
+
 
 ## Everything concerning running the analysis
 
@@ -961,7 +1002,7 @@ run.config(command = run_a)
 def plotting():
     """shows plots on interface"""
     expLabel.place_forget()
-    plots = glob.glob('Output/*.png')
+    plots = glob.glob('Output/*.gif')
     lplots = len(plots)
     try:
 	    for j in range(0, 6):
@@ -971,7 +1012,7 @@ def plotting():
 			    photo2 = photo.subsample(6)
 			    listphotos.insert(i+j*4, photo2)
 			    def showplot(p=i,q=j):
-				"when plot clicked, open a new window with original size"
+				"""when plot clicked, open a new window with original size"""
 				newwin = Toplevel()
 				topscrollbar = Scrollbar(newwin)
 				topscrollbar.pack(side=RIGHT, fill=Y)
@@ -985,8 +1026,7 @@ def plotting():
 			    listcommands.insert(i+j*4, showplot)
 			    listbuttons.insert(i+j*4, Button(frameOUT, 
                             command=listcommands[i+j*4], compound=BOTTOM, 
-                            text=plots[i+j*4][7:][:-4], 
-                            image=listphotos[i+j*4]))
+                            text=plots[i+j*4][7:][:-4], image=listphotos[i+j*4]))
 			    listbuttons[i+j*4].grid(row=j+1, column=i+1)
     except IndexError:
 	    pass
@@ -1020,14 +1060,13 @@ window.protocol("WM_DELETE_WINDOW", on_closing)
 
 
 #Welcome message
-welcome = PhotoImage(file="Welcome.png")
+welcome = PhotoImage(file="Welcome.gif")
 welcomeCanvas = Canvas(window, width=881, height=471)
 welcomeCanvas.place(relx=0.5, rely=0.5, anchor=CENTER)
 welcomeCanvas.create_image(441,236, image=welcome)
 
-#Button to close welcome message and start
 okbutton = Button(window, text="OK", font=("Calibri",20), bg="white", 
-             activebackground="Black", fg= "black", activeforeground="White") 
+             activebackground="Black", fg= "black", activeforeground="White") #Button to close welcome message and start
 okbutton.place(relx=0.5, rely=0.77, anchor=CENTER)
 
 def start():
