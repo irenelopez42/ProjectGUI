@@ -10,7 +10,6 @@ import importlib
 import NewJob
 import CustomConfiguration
 from multiprocessing import Pool 
-import pathos.multiprocessing as mp
 
 import threading 
 import stopping as st
