@@ -22,6 +22,8 @@ import CustomConfiguration
 import NewJob
 import ttk
 import multiprocessing
+import Queue
+
 
 window = tk.Tk()
 window.wm_title("Event Analyser") #GUI Name
@@ -451,7 +453,7 @@ def chooseNlep():
         chooseleppt()
 
 lyes = Checkbutton(frame1, text="Choose number of charged leptons", 
-    font=("Calibri",10),bg="LightCyan2",
+    bg="LightCyan2",
     variable = st_lepcb, onvalue=1,offvalue=0, command=chooseNlep)
 lyes.grid(row=0,column=0, sticky=W) #Define and show checkbox
 
@@ -627,7 +629,7 @@ def choosemissP():
         maxmissE_val.set(200)
 
 minmissPyes = Checkbutton(frame1, text="Missing\n transverse momentum (GeV)", 
-    font=("Calibri",10), bg="LightCyan2", 
+    bg="LightCyan2", 
     variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
 minmissPyes.grid(row=14,column=0, sticky=W) #Define and show checkbutton0
 
@@ -709,7 +711,69 @@ submenu.add_command(label="Root Browser", command=browser)
 
 ## Everything concerning running the analysis
 
-#analysis = None
+#Queue for thread communication
+queue = Queue.Queue(0)
+def check_queue():
+    try:
+        task = queue.get(block=False)
+    except Queue.Empty:
+        pass
+    else:
+        if task == 1:
+            update_bar()
+        if task == 2:
+            for process in pool:
+                process.terminate()
+                process.join()
+            with queue.mutex:
+                queue.queue.clear()
+        if task == 3:
+            plotting()
+        if task == 4:
+            progressbar.grid_forget()
+            global k
+            k = 0
+            progress_var.set(0)
+            abortb.grid_forget()
+            drawingp.grid(row=20)
+            global runpressed
+            if not makeplots:
+                drawingp.grid_forget()
+                plotb.grid(row=20, sticky=E) 
+                run.grid(row=20)
+                runpressed = False
+                return
+    
+            global listphotos
+            del listphotos[:]
+            global listphotosbig
+            del listphotosbig[:]
+            global listcommands
+            del listcommands[:]
+            global listbuttons
+            if len(listbuttons) > 0:
+                for i in range(0,len(listbuttons)):
+                    listbuttons[i].grid_forget()
+            del listbuttons[:]
+            global listlabels
+            del listlabels[:]
+            previousplots=glob.glob('Output/*.gif')
+            for plot in previousplots: 
+                os.remove(plot)
+
+            if not histograms == []:
+                NewPlotResults.plot_results(histograms)
+
+            task = 3
+            queue.put(task)
+            drawingp.grid_forget()
+            plotb.grid(row=20, sticky=E) 
+            run.grid(row=20)
+            runpressed = False
+    window.after(10, check_queue)
+thread_queue = threading.Thread(target=check_queue)
+thread_queue.start()
+
 
 #Button to start analysis
 run = Button(frame1, text="RUN", font=("Calibri",12) ,bg="Green", 
@@ -725,9 +789,8 @@ def abort():
     global pool
     while pool == None:
         continue
-    for process in pool:
-        process.terminate()
-        process.join()
+    task = 2
+    queue.put(task)
         
 abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red", 
     activebackground="Black", fg= "White", activeforeground="White",
@@ -919,47 +982,11 @@ def run_analysis():
     pool.reverse()
     for process in pool:
         process.join()
-        update_bar()
+        task = 1
+        queue.put(task)
    
-    progressbar.grid_forget()
-    global k
-    k = 0
-    progress_var.set(0)
-    abortb.grid_forget()
-    drawingp.grid(row=20)
-    global runpressed
-    if not makeplots:
-        drawingp.grid_forget()
-        plotb.grid(row=20, sticky=E) 
-        run.grid(row=20)
-        runpressed = False
-        return
-    
-    global listphotos
-    del listphotos[:]
-    global listphotosbig
-    del listphotosbig[:]
-    global listcommands
-    del listcommands[:]
-    global listbuttons
-    if len(listbuttons) > 0:
-        for i in range(0,len(listbuttons)):
-            listbuttons[i].grid_forget()
-    del listbuttons[:]
-    global listlabels
-    del listlabels[:]
-    previousplots=glob.glob('Output/*.png')
-    for plot in previousplots: 
-        os.remove(plot)
-
-    if not histograms == []:
-        NewPlotResults.plot_results(histograms)
-
-    plotting()
-    drawingp.grid_forget()
-    plotb.grid(row=20, sticky=E) 
-    run.grid(row=20)
-    runpressed = False
+    task = 4
+    queue.put(task)
     
 class JobPool(multiprocessing.Process):
     """Process object for running a job"""
