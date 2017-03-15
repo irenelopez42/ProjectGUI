@@ -22,8 +22,6 @@ import CustomConfiguration
 import NewJob
 import ttk
 import multiprocessing
-import Queue
-
 
 window = tk.Tk()
 window.wm_title("Event Analyser") #GUI Name
@@ -453,7 +451,7 @@ def chooseNlep():
         chooseleppt()
 
 lyes = Checkbutton(frame1, text="Choose number of charged leptons", 
-    bg="LightCyan2",
+    font=("Calibri",10),bg="LightCyan2",
     variable = st_lepcb, onvalue=1,offvalue=0, command=chooseNlep)
 lyes.grid(row=0,column=0, sticky=W) #Define and show checkbox
 
@@ -629,7 +627,7 @@ def choosemissP():
         maxmissE_val.set(200)
 
 minmissPyes = Checkbutton(frame1, text="Missing\n transverse momentum (GeV)", 
-    bg="LightCyan2", 
+    font=("Calibri",10), bg="LightCyan2", 
     variable = st_missPcb, onvalue=1,offvalue=0, command=choosemissP)
 minmissPyes.grid(row=14,column=0, sticky=W) #Define and show checkbutton0
 
@@ -711,26 +709,7 @@ submenu.add_command(label="Root Browser", command=browser)
 
 ## Everything concerning running the analysis
 
-#Queue for thread communication
-queue = Queue.Queue(0)
-def check_queue():
-    try:
-        task = queue.get(block=False)
-    except Queue.Empty:
-        pass
-    else:
-        if task == 1:
-            update_bar()
-        if task == 2:
-            for process in pool:
-                process.terminate()
-                process.join()
-        if task == 3:
-            plotting()
-    window.after(10, check_queue)
-thread_queue = threading.Thread(target=check_queue)
-thread_queue.start()
-
+#analysis = None
 
 #Button to start analysis
 run = Button(frame1, text="RUN", font=("Calibri",12) ,bg="Green", 
@@ -746,8 +725,9 @@ def abort():
     global pool
     while pool == None:
         continue
-    task = 2
-    queue.put(task)
+    for process in pool:
+        process.terminate()
+        process.join()
         
 abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red", 
     activebackground="Black", fg= "White", activeforeground="White",
@@ -939,8 +919,7 @@ def run_analysis():
     pool.reverse()
     for process in pool:
         process.join()
-        task = 1
-        queue.put(task)
+        update_bar()
    
     progressbar.grid_forget()
     global k
@@ -969,15 +948,14 @@ def run_analysis():
     del listbuttons[:]
     global listlabels
     del listlabels[:]
-    previousplots=glob.glob('Output/*.gif')
+    previousplots=glob.glob('Output/*.png')
     for plot in previousplots: 
         os.remove(plot)
 
     if not histograms == []:
         NewPlotResults.plot_results(histograms)
 
-    task = 3
-    queue.put(task)
+    plotting()
     drawingp.grid_forget()
     plotb.grid(row=20, sticky=E) 
     run.grid(row=20)
