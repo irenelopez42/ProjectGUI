@@ -711,9 +711,6 @@ submenu.add_command(label="Root Browser", command=browser)
 
 ## Everything concerning running the analysis
 
-#Queue for thread communication
-queue = Queue.Queue()
-
 #Button to start analysis
 run = Button(frame1, text="RUN", font=("Calibri",12) ,bg="Green", 
     activebackground="Black", fg= "White", activeforeground="White")
@@ -728,9 +725,8 @@ def abort():
     global pool
     while pool == None:
         continue
-    for process in pool:
-        process.terminate()
-        process.join()
+    task = 2
+    queue.put(task)
         
 abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red", 
     activebackground="Black", fg= "White", activeforeground="White",
@@ -748,6 +744,25 @@ def update_bar():
     progress_var.set(k)
     k += 1
     window.update_idletasks()
+#Queue for progress bar
+queue = Queue.Queue(0)
+def check_queue():
+    try:
+        task = queue.get(block=False)
+    except Queue.Empty:
+        pass
+    else:
+        if task == 1:
+            update_bar()
+        if task == 2:
+            for process in pool:
+                process.terminate()
+                process.join()
+        if task == 3:
+            plotting()
+    window.after(10, check_queue)
+thread_queue = threading.Thread(target=check_queue)
+thread_queue.start()
 
 #Label for when plots are being drawn
 drawingp = Label(frame1, text="Drawing plots...",fg="black", height=2, 
@@ -922,7 +937,8 @@ def run_analysis():
     pool.reverse()
     for process in pool:
         process.join()
-        queue.put(update_bar())
+        task = 1
+        queue.put(task)
    
     progressbar.grid_forget()
     global k
@@ -958,7 +974,8 @@ def run_analysis():
     if not histograms == []:
         NewPlotResults.plot_results(histograms)
 
-    queue.put(plotting())
+    task = 3
+    queue.put(task)
     drawingp.grid_forget()
     plotb.grid(row=20, sticky=E) 
     run.grid(row=20)
