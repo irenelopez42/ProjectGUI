@@ -711,6 +711,27 @@ submenu.add_command(label="Root Browser", command=browser)
 
 ## Everything concerning running the analysis
 
+#Queue for thread communication
+queue = Queue.Queue(0)
+def check_queue():
+    try:
+        task = queue.get(block=False)
+    except Queue.Empty:
+        pass
+    else:
+        if task == 1:
+            update_bar()
+        if task == 2:
+            for process in pool:
+                process.terminate()
+                process.join()
+        if task == 3:
+            plotting()
+    window.after(10, check_queue)
+thread_queue = threading.Thread(target=check_queue)
+thread_queue.start()
+
+
 #Button to start analysis
 run = Button(frame1, text="RUN", font=("Calibri",12) ,bg="Green", 
     activebackground="Black", fg= "White", activeforeground="White")
@@ -744,25 +765,6 @@ def update_bar():
     progress_var.set(k)
     k += 1
     window.update_idletasks()
-#Queue for progress bar
-queue = Queue.Queue(0)
-def check_queue():
-    try:
-        task = queue.get(block=False)
-    except Queue.Empty:
-        pass
-    else:
-        if task == 1:
-            update_bar()
-        if task == 2:
-            for process in pool:
-                process.terminate()
-                process.join()
-        if task == 3:
-            plotting()
-    window.after(10, check_queue)
-thread_queue = threading.Thread(target=check_queue)
-thread_queue.start()
 
 #Label for when plots are being drawn
 drawingp = Label(frame1, text="Drawing plots...",fg="black", height=2, 
