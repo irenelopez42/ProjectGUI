@@ -366,7 +366,7 @@ def extLepOpts():
         qinvmass.grid(row=7, sticky=E)
     if nlep_val.get() == 3:
         clearFrame()
-        OptionsLep.grid(row=1, column=1, rowspan=7)
+        OptionsLep.grid(row=1, column=1, rowspan=7,sticky=N)
         chooseLepchargecb.grid(row=0,sticky=W)
         qcharges.grid(row=0, sticky=E)
         chooseLepflavourcb.grid(row=3,sticky=W)
@@ -382,7 +382,7 @@ def extLepOpts():
         slider_maxLepTMass.grid(row=9)
     if nlep_val.get() == 4:
         clearFrame()
-        OptionsLep.grid(row=1, column=1, rowspan=7)
+        OptionsLep.grid(row=2, column=1, rowspan=7,sticky=N)
         chooseLepchargecb.grid(row=0, sticky=W)
         qcharges.grid(row=0, sticky=E)
         chooseLepflavourcb.grid(row=3, sticky=W)
@@ -729,45 +729,21 @@ def check_queue():
             plotting()
         if task == 3:
             progressbar.grid_forget()
-            global k
-            k = 0
-            progress_var.set(0)
+        if task == 4:
             abortb.grid_forget()
             drawingp.grid(row=20)
-            global runpressed
-            if not makeplots:
-                drawingp.grid_forget()
-                plotb.grid(row=20, sticky=E) 
-                run.grid(row=20)
-                runpressed = False
-                return
-    
-            global listphotos
-            del listphotos[:]
-            global listphotosbig
-            del listphotosbig[:]
-            global listcommands
-            del listcommands[:]
-            global listbuttons
-            if len(listbuttons) > 0:
-                for i in range(0,len(listbuttons)):
-                    listbuttons[i].grid_forget()
-            del listbuttons[:]
-            global listlabels
-            del listlabels[:]
-            previousplots=glob.glob('Output/*.gif')
-            for plot in previousplots: 
-                os.remove(plot)
-
-            if not histograms == []:
-                NewPlotResults.plot_results(histograms)
-
-            task = 2
-            queue.put(task)
+        if task == 5:
             drawingp.grid_forget()
             plotb.grid(row=20, sticky=E) 
             run.grid(row=20)
-            runpressed = False
+        if task == 6:
+            global listbuttons
+            for i in range(0,len(listbuttons)):
+                listbuttons[i].grid_forget()
+        if task == 7:
+            drawingp.grid_forget()
+            plotb.grid(row=20, sticky=E)
+            run.grid(row=20)
     window.after(10, check_queue)
 window.after(10, check_queue)
 
@@ -780,7 +756,6 @@ run.grid(row=20, column=0)
 #Abort button
 def abort():
     """aborts analysis"""
-   
     global makeplots #do not draw plots if abort is pressed
     makeplots = False
     global pool
@@ -789,6 +764,8 @@ def abort():
     for process in pool:
         process.terminate()
         process.join()
+    with queue.mutex:
+        queue.queue.clear()
         
 abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red", 
     activebackground="Black", fg= "White", activeforeground="White",
@@ -987,6 +964,44 @@ def run_analysis():
    
     task = 3
     queue.put(task)
+
+    global k
+    k = 0
+    progress_var.set(0)
+    task = 4
+    queue.put(task)
+    global runpressed
+    if not makeplots:
+        task = 5
+        queue.put(task)
+        runpressed = False
+        return
+
+    global listphotos
+    del listphotos[:]
+    global listphotosbig
+    del listphotosbig[:]
+    global listcommands
+    del listcommands[:]
+    global listbuttons
+    if len(listbuttons) > 0:
+        task = 6
+        queue.put(task)
+    del listbuttons[:]
+    global listlabels
+    del listlabels[:]
+    previousplots=glob.glob('Output/*.gif')
+    for plot in previousplots: 
+        os.remove(plot)
+
+    if not histograms == []:
+        NewPlotResults.plot_results(histograms)
+
+    task = 2
+    queue.put(task)
+    task = 7
+    queue.put(task) 
+    runpressed = False
     
 class JobPool(multiprocessing.Process):
     """Process object for running a job"""
@@ -1028,7 +1043,8 @@ run.config(command = run_a)
 #Function and button to plot results
 def plotting():
     """shows plots on interface"""
-    listbuttons = []
+    global listbuttons
+    del listbuttons[:]
     if histograms == []:
         plots = glob.glob('Output/*.gif')
     else:
@@ -1064,7 +1080,10 @@ def plotting():
                 listbuttons[i+j*4].grid(row=j+1, column=i+1)
     except IndexError:
 	pass
-    for i in range(0,4):
+    jetplots = 4
+    if plots[1] == 'Output/'+'b-tag Jet Number'+'.gif':
+        jetplots = 5
+    for i in range(0,jetplots):
         listbuttons[i].config(bg="lightsteelblue1")
     listbuttons[-1].config(bg="azure")
     if histograms == []:
