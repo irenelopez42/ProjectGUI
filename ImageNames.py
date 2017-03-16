@@ -19,5 +19,5 @@ ImageDic = {
     "etmiss" : "Missing momentum",
     "lep_phi" : "Lepton phi",
     "jet_eta" :"Jet eta",
-    
+    "btag" : "b-tag Jet Number",
 }

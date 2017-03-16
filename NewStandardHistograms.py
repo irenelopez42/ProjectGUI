@@ -54,5 +54,5 @@ def getStandardHistogram(name):
     if (name == "invMass"):           return ROOT.TH1D("invMass",           "Invariant Mass;M_{ll} [GeV]; Events", 30, -30,120)
     if (name == "invMass2"):           return ROOT.TH1D("invMass2",           "Invariant Mass of second;M_{ll} [GeV]; Events", 30, -30,120)    
     if (name =="deltaTheta"): 	      return ROOT.TH1D("deltaTheta", "Angle Between Lepton and Missing Momentum;#theta^{lepton,miss};",100,0,3.2)
-    
+    if (name =="btag"):             return ROOT.TH1D("btag","Number of b-tagged jets;N_{bjet};Events,",10,-0.5,9.5)
     return None

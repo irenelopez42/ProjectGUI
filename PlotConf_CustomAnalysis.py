@@ -28,6 +28,7 @@ config = {
     "invMass"              : {"xtitle" : "m_{ll} [GeV]"},
     "invMass2"              : {"xtitle" : "m_{ll} [GeV]"},
     "WtMass"          : {"xtitle" : "m_{T}^{W} [GeV]"},
+    "btag"	      : {},
 
 
    

@@ -36,16 +36,18 @@ class CheckBTag(CheckFile):
     """checks the number of B tagged jets is within minBTag and
     maxBTag"""
     
-    def __init__(self,minBTag,maxBTag):
+    def __init__(self,minBTag,maxBTag,histogram):
         super(CheckBTag,self).__init__()
         self.minBTag = minBTag
         self.maxBTag = maxBTag
-
+        self.histogram =histogram        
+        
     def check(self,EventObject,histogramDic):
         goodJets = EventObject["jets"]
         btags = sum([1 for jet in goodJets if jet.mv1() > 0.7892])    
         if btags<self.minBTag or btags > self.maxBTag:
             return False 
+        histogramDic[self.histogram] = btags
         return True
             
 class CheckNLep(CheckFile):
