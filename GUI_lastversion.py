@@ -65,7 +65,7 @@ frame1.grid_columnconfigure(1, minsize=180, weight=1)
 frameOUT = Frame(window, width="812", height="700", bg="thistle4") #For plots
 frameOUT.pack(side=LEFT, fill=BOTH, expand=1)
 #These will make the plots appear centered
-frameOUT.grid_rowconfigure(0, minsize=83, weight=1)
+frameOUT.grid_rowconfigure(0, minsize=5, weight=1)
 frameOUT.grid_rowconfigure(6, minsize=83, weight=1)
 frameOUT.grid_columnconfigure(0, minsize=50, weight=1)
 frameOUT.grid_columnconfigure(6, minsize=50, weight=1) 
@@ -726,14 +726,8 @@ def check_queue():
         if task == 1:
             update_bar()
         if task == 2:
-            for process in pool:
-                process.terminate()
-                process.join()
-            with queue.mutex:
-                queue.queue.clear()
-        if task == 3:
             plotting()
-        if task == 4:
+        if task == 3:
             progressbar.grid_forget()
             global k
             k = 0
@@ -768,15 +762,14 @@ def check_queue():
             if not histograms == []:
                 NewPlotResults.plot_results(histograms)
 
-            task = 3
+            task = 2
             queue.put(task)
             drawingp.grid_forget()
             plotb.grid(row=20, sticky=E) 
             run.grid(row=20)
             runpressed = False
     window.after(10, check_queue)
-thread_queue = threading.Thread(target=check_queue)
-thread_queue.start()
+window.after(10, check_queue)
 
 
 #Button to start analysis
@@ -793,8 +786,9 @@ def abort():
     global pool
     while pool == None:
         continue
-    task = 2
-    queue.put(task)
+    for process in pool:
+        process.terminate()
+        process.join()
         
 abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red", 
     activebackground="Black", fg= "White", activeforeground="White",
@@ -838,6 +832,18 @@ def run_analysis():
 
     histograms.append("n_jets")
 
+    if st_jetcb.get() ==1: #number of jets
+        jetn_chk = CheckFileSuper.CheckNJets(minnjet_val.get(),
+            maxnjet_val.get())
+        selection.append(jetn_chk)
+ 
+        
+        if st_btagjetcb.get()==1: #btagging
+            btag_chk = CheckFileSuper.CheckBTag(btagmin_val.get(),
+                btagmax_val.get(),"btag")
+            selection.append(btag_chk)
+            histograms.append("btag")
+
     if minnjet_val.get()<=maxnjet_val.get() or maxnjet_val.get()!=0:
                
         histograms.append("jet_pt")
@@ -854,18 +860,6 @@ def run_analysis():
 
     if st_lepptcb.get()==1:
         AH.lep_num = leppt_val.get()
-    
-    if st_jetcb.get() ==1: #number of jets
-        jetn_chk = CheckFileSuper.CheckNJets(minnjet_val.get(),
-            maxnjet_val.get())
-        selection.append(jetn_chk)
- 
-        
-        if st_btagjetcb.get()==1: #btagging
-            btag_chk = CheckFileSuper.CheckBTag(btagmin_val.get(),
-                btagmax_val.get(),"btag")
-            selection.append(btag_chk)
-            histograms.append("btag")
             
     if st_lepcb.get() != 0: #number of leptons
     
@@ -991,7 +985,7 @@ def run_analysis():
         task = 1
         queue.put(task)
    
-    task = 4
+    task = 3
     queue.put(task)
     
 class JobPool(multiprocessing.Process):
