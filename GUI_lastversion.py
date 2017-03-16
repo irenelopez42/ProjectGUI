@@ -27,7 +27,9 @@ import Queue
 
 window = tk.Tk()
 window.wm_title("Event Analyser") #GUI Name
-window.iconbitmap('@'+'icon.xbm') #Icon for the programme
+#window.iconbitmap('@'+'icon.xbm') #Icon for the programme
+img = PhotoImage(file='icon.gif')
+window.tk.call('wm', 'iconphoto', window._w, img)
 
 """Define a drop down menu in case we need it
 menu = Menu(window)
