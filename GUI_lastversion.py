@@ -789,6 +789,8 @@ def abort():
     for process in pool:
         process.terminate()
         process.join()
+        print "test"
+
         
 abortb = Button(frame1, text="ABORT", font=("Calibri",12), bg="Red", 
     activebackground="Black", fg= "White", activeforeground="White",
@@ -981,9 +983,13 @@ def run_analysis():
                 
     pool.reverse()
     for process in pool:
-        process.join()
-        task = 1
-        queue.put(task)
+        print "test2"
+        if makeplots:
+            process.join()
+            task = 1
+            queue.put(task)
+    
+    print "test3"
    
     task = 3
     queue.put(task)
