@@ -23,13 +23,12 @@ import NewJob
 import ttk
 import multiprocessing
 import Queue
+import ImageNames as imn
 
 
 window = tk.Tk()
 window.wm_title("Event Analyser") #GUI Name
-#window.iconbitmap('@'+'icon.xbm') #Icon for the programme
-img = PhotoImage(file='icon.gif')
-window.tk.call('wm', 'iconphoto', window._w, img)
+window.iconbitmap('@'+'icon.xbm') #Icon for the programme
 
 """Define a drop down menu in case we need it
 menu = Menu(window)
@@ -835,22 +834,20 @@ def run_analysis():
     CustomConfiguration.Job["Fraction"] = percentg_val.get()/100.0   
 
     histograms.append("n_jets")
+
+    if minnjet_val.get()<=maxnjet_val.get() or maxnjet_val.get()!=0:
+               
+        histograms.append("jet_pt")
+        histograms.append("jet_eta")
+        histograms.append("jet_m")
+
     histograms.append("lep_n")
-    
-    if minmissE_val.get()<=maxmissE_val.get() or maxmissE_val.get()!=0:
-        histograms.append("etmiss")
         
     if st_lepcb.get() == 0 or nlep_val.get() !=0:
         histograms.append("lep_pt")
         histograms.append("lep_eta")
         histograms.append("lep_phi")
         histograms.append("lep_E")
-
-    if minnjet_val.get()<=maxnjet_val.get() or maxnjet_val.get()!=0:
-               
-        histograms.append("jet_pt")
-        histograms.append("jet_m")
-        histograms.append("jet_eta")
 
     if st_lepptcb.get()==1:
         AH.lep_num = leppt_val.get()
@@ -959,6 +956,9 @@ def run_analysis():
             histograms.append("invMass")
             histograms.append("invMass2")
 
+    if minmissE_val.get()<=maxmissE_val.get() or maxmissE_val.get()!=0:
+        histograms.append("etmiss")
+
     if st_missPcb.get()==1: #missing momentum
         missE_chk = CheckFileSuper.CheckEtMiss(minmissE_val.get(),
             maxmissE_val.get())
@@ -1030,35 +1030,48 @@ run.config(command = run_a)
 #Function and button to plot results
 def plotting():
     """shows plots on interface"""
+    listbuttons = []
+    if histograms == []:
+        plots = glob.glob('Output/*.gif')
+    else:
+        plots = []
+        for i in range(0,len(histograms)):
+            name = imn.ImageDic[histograms[i]]
+            plots.append(glob.glob('Output/'+name+'.gif'))
+        plots = sum(plots,[])
     expLabel.place_forget()
-    plots = glob.glob('Output/*.gif')
-    lplots = len(plots)
     try:
-	    for j in range(0, 6):
-		    for i in range(0,4):
-			    photo = PhotoImage(file= plots[i+j*4])
-			    listphotosbig.insert(i+j*4, photo)
-			    photo2 = photo.subsample(6)
-			    listphotos.insert(i+j*4, photo2)
-			    def showplot(p=i,q=j):
-				"""when plot clicked, open a new window with original size"""
-				newwin = Toplevel()
-				topscrollbar = Scrollbar(newwin)
-				topscrollbar.pack(side=RIGHT, fill=Y)
-				topcanvas = Canvas(newwin, width=900, 
-                                height=2000, yscrollcommand=topscrollbar.set,
-                                scrollregion=(0,0,0,850))
-				topcanvas.pack()
-				bigplot = topcanvas.create_image(450,420, 
-                                image = listphotosbig[p+q*4])
-                                topscrollbar.config(command=topcanvas.yview)
-			    listcommands.insert(i+j*4, showplot)
-			    listbuttons.insert(i+j*4, Button(frameOUT, 
-                            command=listcommands[i+j*4], compound=BOTTOM, 
-                            text=plots[i+j*4][7:][:-4], image=listphotos[i+j*4]))
-			    listbuttons[i+j*4].grid(row=j+1, column=i+1)
+	for j in range(0, 6):
+	    for i in range(0,4):
+		photo = PhotoImage(file= plots[i+j*4])
+        	listphotosbig.insert(i+j*4, photo)
+                photo2 = photo.subsample(6)
+                listphotos.insert(i+j*4, photo2)
+		def showplot(p=i,q=j):
+		    """when plot clicked, open a new window with original size"""
+		    newwin = Toplevel()
+		    topscrollbar = Scrollbar(newwin)
+		    topscrollbar.pack(side=RIGHT, fill=Y)
+		    topcanvas = Canvas(newwin, width=900, 
+                    height=900, yscrollcommand=topscrollbar.set,
+                    scrollregion=(0,0,0,900))
+		    topcanvas.pack()
+		    bigplot = topcanvas.create_image(451,451, 
+                    image = listphotosbig[p+q*4])
+                    topscrollbar.config(command=topcanvas.yview)
+                listcommands.insert(i+j*4, showplot)
+	        listbuttons.insert(i+j*4, Button(frameOUT, 
+                command=listcommands[i+j*4], compound=BOTTOM, 
+                text=plots[i+j*4][7:][:-4], bg="peach puff", image=listphotos[i+j*4]))
+                listbuttons[i+j*4].grid(row=j+1, column=i+1)
     except IndexError:
-	    pass
+	pass
+    for i in range(0,4):
+        listbuttons[i].config(bg="lightsteelblue1")
+    listbuttons[-1].config(bg="azure")
+    if histograms == []:
+        for i in range(0, len(listbuttons)):
+             listbuttons[i].config(bg="light grey")
 
 listphotos = [] #some lists needed
 listphotosbig = []
