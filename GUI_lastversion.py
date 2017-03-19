@@ -942,7 +942,6 @@ def run_analysis():
         selection.append(missE_chk) 
         
     processingDict = CustomConfiguration.Processes
-    print CustomConfiguration.Job["Fraction"]
         
     CustomConfiguration.Job["Batch"] = True
     jobs = [NewJob.NewJob(processName,CustomConfiguration.Job,
@@ -959,13 +958,10 @@ def run_analysis():
                 
     pool.reverse()
     for process in pool:
-        print "test2"
-        if makeplots:
-            process.join()
-            task = 1
-            queue.put(task)
+        process.join()
+        task = 1
+        queue.put(task)
     
-    print "test3"
    
     task = 3
     queue.put(task)
@@ -1081,7 +1077,9 @@ def plotting():
                 listcommands.insert(i+j*4, showplot)
 	        listbuttons.insert(i+j*4, Button(frameOUT, 
                 command=listcommands[i+j*4], compound=BOTTOM, 
-                text=plots[i+j*4][7:][:-4], bg="peach puff", image=listphotos[i+j*4]))
+                text=plots[i+j*4][7:][:-4], bg="peach puff", 
+                image=listphotos[i+j*4]))
+                
                 listbuttons[i+j*4].grid(row=j+1, column=i+1)
     except IndexError:
 	pass
@@ -1129,8 +1127,9 @@ welcomeCanvas = Canvas(window, width=881, height=471)
 welcomeCanvas.place(relx=0.5, rely=0.5, anchor=CENTER)
 welcomeCanvas.create_image(441,236, image=welcome)
 
+#Button to close welcome message and start
 okbutton = Button(window, text="OK", font=("Calibri",20), bg="white", 
-             activebackground="Black", fg= "black", activeforeground="White") #Button to close welcome message and start
+             activebackground="Black", fg= "black", activeforeground="White") 
 okbutton.place(relx=0.5, rely=0.77, anchor=CENTER)
 
 def start():
