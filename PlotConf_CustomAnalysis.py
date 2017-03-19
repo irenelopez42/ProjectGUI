@@ -54,10 +54,10 @@ config = {
                 "Color"         : "#fa7921",
                 "Contributions" : ["WW"]},
             "WZ" : {
-                "Color"         : "#fa6021",
+                "Color"         : "#2177f9",
                 "Contributions" : ["WZ"]},
             "ZZ" : {
-                "Color"         : "#fa3021",
+                "Color"         : "#fc1bb1",
                 "Contributions" : ["ZZ"]},
                                 
             "DrellYan": {       

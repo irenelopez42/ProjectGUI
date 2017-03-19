@@ -738,8 +738,9 @@ def check_queue():
             run.grid(row=20)
         if task == 6:
             global listbuttons
-            for i in range(0,len(listbuttons)):
-                listbuttons[i].grid_forget()
+            if len(listbuttons) > 0:
+                for i in range(0,len(listbuttons)):
+                    listbuttons[i].grid_forget()
         if task == 7:
             drawingp.grid_forget()
             plotb.grid(row=20, sticky=E)
@@ -764,7 +765,6 @@ def abort():
     for process in pool:
         process.terminate()
         process.join()
-
     with queue.mutex:
         queue.queue.clear()
         
@@ -961,8 +961,7 @@ def run_analysis():
         process.join()
         task = 1
         queue.put(task)
-    
-   
+
     task = 3
     queue.put(task)
 
@@ -984,11 +983,8 @@ def run_analysis():
     del listphotosbig[:]
     global listcommands
     del listcommands[:]
-    global listbuttons
-    if len(listbuttons) > 0:
-        task = 6
-        queue.put(task)
-    del listbuttons[:]
+    task = 6
+    queue.put(task)
     global listlabels
     del listlabels[:]
     previousplots=glob.glob('Output/*.gif')
